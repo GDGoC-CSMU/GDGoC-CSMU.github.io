@@ -3,565 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Developer Student Clubs on CSMU - 中山醫學大學 AI與開源資訊社</title>
-  
+  <title>GDGoC CSMU - 社團首頁</title>
   <style>
-    /*網站整體視覺風格設定 (控制全站的顏色、字型與平滑滾動)*/
+    /* 全局變數 */
     :root {
-      --bg-light: #f8f9fa;        /*淺灰:背景*/
-      --navy-dark: #0b1a30;       /*深藍:卡片、主按鈕背景*/
-      --text-dark: #212529;       /*黑色:主要文字*/
-      --text-gray: #6c757d;       /*灰色:次要文字*/
-      --blue-accent: #0066cc;     /*藍色:強調文字/按鈕*/
-      --border-color: #e9ecef;    /*邊框顏色*/
+      --bg-light: #f8f9fa;
+      --navy-dark: #0b1a30;
+      --text-dark: #212529;
+      --text-gray: #6c757d;
+      --blue-accent: #0066cc;
+      --border-color: #e9ecef;
     }
 
-    /* 單頁平滑滾動關鍵設定 */
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: 80px; /* 定位時預留頂部導覽列高度，防止標題被遮住 */
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+    body { background-color: #ffffff; color: var(--text-dark); line-height: 1.6; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    }
-
-    body {
-      background-color: #ffffff;
-      color: var(--text-dark);
-      line-height: 1.6;
-    }
-
-    /* ==========================================================================
-       【2. 頂部固定導覽列 (Header Navigation)】
-       ========================================================================== */
+    /* 固定頁首導覽列 */
     header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px 8%;
-      border-bottom: 1px solid var(--border-color);
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px); /* 毛玻璃效果 */
+      position: sticky; top: 0; z-index: 1000;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 8%; border-bottom: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
     }
+    .logo { font-weight: 800; font-size: 1.2rem; }
+    nav a { margin: 0 15px; text-decoration: none; color: var(--text-dark); font-weight: 500; transition: color 0.2s; }
+    nav a:hover, nav a.active { color: var(--blue-accent); font-weight: 700; }
 
-    .logo {
-      font-weight: 800;
-      font-size: 1.2rem;
-      letter-spacing: 1px;
-    }
+    /* Hero 區塊 */
+    .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 60px 8%; align-items: start; }
+    .hero-left h1 { font-size: 3rem; line-height: 1.15; font-weight: 800; margin-bottom: 15px; }
+    .hero-left .subtitle { color: var(--blue-accent); font-size: 1.2rem; font-weight: 600; margin-bottom: 30px; }
+    .btn-contact { padding: 12px 28px; background-color: var(--blue-accent); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
 
-    nav a {
-      margin: 0 15px;
-      text-decoration: none;
-      color: var(--text-dark);
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    nav a:hover {
-      color: var(--blue-accent);
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .btn-quote {
-      padding: 8px 18px;
-      border: 1.5px solid var(--text-dark);
-      background: transparent;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .btn-quote:hover {
-      background: var(--text-dark);
-      color: #fff;
-    }
-
-    /* ==========================================================================
-       【3. 首頁 Hero 區塊與 5 方塊 Bento Grid】
-       ========================================================================== */
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      padding: 60px 8%;
-      align-items: start;
-    }
-
-    .hero-left {
-      padding-top: 10px; /* 標題上移，視覺更平衡 */
-    }
-
-    .hero-left h1 {
-      font-size: 3rem;
-      line-height: 1.15;
-      font-weight: 800;
-      margin-bottom: 15px;
-    }
-
-    .hero-left .subtitle {
-      color: var(--blue-accent);
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 30px;
-    }
-
-    .btn-contact {
-      padding: 12px 28px;
-      background-color: var(--blue-accent);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,102,204,0.2);
-      transition: background-color 0.2s;
-    }
-
-    .btn-contact:hover {
-      background-color: #004d99;
-    }
-
-    /* 5 方塊 Bento Grid (網格) 控制 */
-    .bento-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 180px);
-      gap: 12px;
-    }
-
-    .bento-item {
-      border-radius: 12px;
-      overflow: hidden;
-      background-color: #eee;
-    }
-
-    .bento-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: grayscale(100%); /* 預設黑白照片 */
-      transition: filter 0.3s;
-    }
-
-    .bento-item img:hover {
-      filter: grayscale(0%); /* 滑鼠靠近變彩色 */
-    }
-
-    /* 方塊排列位置 */
+    /* Bento Grid */
+    .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 180px); gap: 12px; }
+    .bento-item { border-radius: 12px; overflow: hidden; background-color: #eee; }
+    .bento-item img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: filter 0.3s; }
+    .bento-item img:hover { filter: grayscale(0%); }
     .bento-1 { grid-column: 1 / 2; grid-row: 1 / 2; }
     .bento-2 { grid-column: 1 / 2; grid-row: 2 / 3; }
-    .bento-3 { grid-column: 2 / 3; grid-row: 1 / 3; } /* 中間貫穿大圖 */
+    .bento-3 { grid-column: 2 / 3; grid-row: 1 / 3; }
     .bento-4 { grid-column: 3 / 4; grid-row: 1 / 2; }
     .bento-5 { grid-column: 3 / 4; grid-row: 2 / 3; }
 
-    /* ==========================================================================
-       【4. 區塊一：About 社團特色資訊輪播卡】
-       ========================================================================== */
-    .section-padding {
-      padding: 80px 8%;
-    }
+    /* 社團特色輪播 */
+    .section-padding { padding: 80px 8%; }
+    .slider-wrapper { position: relative; max-width: 900px; margin: 0 auto; }
+    .card-container { display: flex; border-radius: 16px; overflow: hidden; background-color: var(--navy-dark); color: white; min-height: 320px; }
+    .card-img { width: 45%; object-fit: cover; }
+    .card-content { width: 55%; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+    .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 90px; border: none; font-size: 1.5rem; font-weight: bold; cursor: pointer; background: #fff; color: #333; z-index: 10; }
+    .slider-btn-left { left: -21px; box-shadow: 2px 0 10px rgba(0,0,0,0.15); border-radius: 6px 0 0 6px; }
+    .slider-btn-right { right: -21px; box-shadow: -2px 0 10px rgba(0,0,0,0.15); border-radius: 0 6px 6px 0; }
 
-    .section-title {
-      font-size: 1.8rem;
-      margin-bottom: 30px;
-      font-weight: 700;
-    }
-
-    .slider-wrapper {
-      position: relative;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .card-container {
-      display: flex;
-      border-radius: 16px;
-      overflow: hidden;
-      background-color: var(--navy-dark);
-      color: white;
-      min-height: 320px;
-    }
-
-    .card-img {
-      width: 45%;
-      object-fit: cover;
-    }
-
-    .card-content {
-      width: 55%;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .card-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 12px;
-    }
-
-    .card-desc {
-      font-size: 1.05rem;
-      line-height: 1.6;
-      opacity: 0.9;
-    }
-
-    /* 左右切換按鈕（兩側皆改為白色背景） */
-    .slider-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 42px;
-      height: 90px;
-      border: none;
-      font-size: 1.5rem;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      background-color: #ffffff; /* 統一為白色背景 */
-      color: #333333;           /* 黑色箭頭 */
-      transition: background-color 0.2s, box-shadow 0.2s;
-    }
-
-    .slider-btn:hover {
-      background-color: #f0f0f0;
-    }
-
-    .slider-btn-left {
-      left: -21px;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.15);
-      border-radius: 6px 0 0 6px;
-    }
-
-    .slider-btn-right {
-      right: -21px;
-      box-shadow: -2px 0 10px rgba(0,0,0,0.15);
-      border-radius: 0 6px 6px 0;
-    }
-
-    /* ==========================================================================
-       【5. 區塊二：Courses 課程卡片】
-       ========================================================================== */
-    .courses-section {
-      background-color: var(--bg-light);
-    }
-
-    .courses-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .course-card {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }
-
-    .course-card h3 {
-      margin-bottom: 10px;
-      color: var(--blue-accent);
-    }
-
-    /* ==========================================================================
-       【6. 區塊三：Activities 行事曆】
-       ========================================================================== */
-    .calendar-container {
-      max-width: 900px;
-      margin: 30px auto 0;
-      background: #fff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    }
-
-    .calendar-iframe {
-      width: 100%;
-      height: 500px;
-      border: 0;
-    }
-
-    .btn-google-cal {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 12px 24px;
-      background-color: var(--navy-dark);
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: 600;
-      transition: opacity 0.2s;
-    }
-
-    .btn-google-cal:hover {
-      opacity: 0.9;
-    }
-
-    /* ==========================================================================
-       【7. 頁尾 Footer 聯絡資訊】
-       ========================================================================== */
-    footer {
-      background-color: #f1f3f5;
-      padding: 50px 8% 20px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 40px;
-      margin-bottom: 40px;
-    }
-
-    .footer-col h4 {
-      margin-bottom: 15px;
-      font-size: 1.1rem;
-    }
-
-    .footer-col p, .footer-col a {
-      color: var(--text-gray);
-      text-decoration: none;
-      display: block;
-      margin-bottom: 8px;
-      font-size: 0.95rem;
-    }
-
-    .btn-back-top {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      padding: 10px 15px;
-      cursor: pointer;
-      float: right;
-      border-radius: 4px;
-    }
-
-    .footer-bottom {
-      text-align: center;
-      color: var(--text-gray);
-      font-size: 0.85rem;
-      padding-top: 20px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    /* 手機版自動伸縮 (RWD) */
-    @media (max-width: 768px) {
-      .hero { grid-template-columns: 1fr; }
-      .bento-grid { grid-template-rows: repeat(2, 120px); }
-      .card-container { flex-direction: column; }
-      .card-img, .card-content { width: 100%; }
-      .footer-grid { grid-template-columns: 1fr; }
-      .slider-btn { height: 60px; width: 30px; }
-    }
+    /* Footer */
+    footer { background-color: #f1f3f5; padding: 50px 8% 20px; border-top: 1px solid var(--border-color); }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-bottom: 40px; }
   </style>
 </head>
 <body>
 
-  <!-- ==========================================================================
-       【HTML 區塊 1：頁首導覽列】
-       要在選單新增頁面，只要複製 <a href="#id">項目名稱</a> 即可。
-       ========================================================================== -->
+  <!-- 導覽列：透過實體檔案連結切換 -->
   <header>
-    <div class="logo">BRIGHTNEST HOMEWORKS</div>
+    <div class="logo">GDGoC CSMU</div>
     <nav>
-      <a href="#about">About</a>
-      <a href="#courses">Courses</a>
-      <a href="#activities">Activities</a>
-      <a href="#contact">Contact</a>
+      <a href="index.html" class="active">About (首頁)</a>
+      <a href="courses.html">Courses (課程分類)</a>
+      <a href="activities.html">Activities (社團活動)</a>
     </nav>
-    <div class="header-right">
-      <span>123-456-7890</span>
-      <button class="btn-quote" onclick="location.href='#contact'">Get a Quote</button>
-    </div>
   </header>
 
-  <!-- ==========================================================================
-       【HTML 區塊 2：Hero 主視覺】
-       包含大標題、 Contact Us 按鈕與右側 5 張照片。
-       ========================================================================== -->
   <section class="hero">
     <div class="hero-left">
       <h1>Developer<br>Student Clubs<br>on CSMU</h1>
       <div class="subtitle">中山醫學大學 AI與開源資訊社</div>
-      
-      <!-- 點擊此按鈕會自動滑動到最底部的 Contact (footer) 區塊 -->
-      <button class="btn-contact" onclick="location.href='#contact'">Contact Us</button>
+      <a href="activities.html" class="btn-contact">探索社團活動</a>
     </div>
     
-    <!-- 5 方塊照片展示 (更改圖片網址即可更換照片) -->
     <div class="bento-grid">
-      <div class="bento-item bento-1"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500" alt="照片1"></div>
-      <div class="bento-item bento-2"><img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500" alt="照片2"></div>
-      <div class="bento-item bento-3"><img src="https://images.unsplash.com/photo-1477959858617-67f30ac4ce71?w=500" alt="照片3"></div>
-      <div class="bento-item bento-4"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500" alt="照片4"></div>
-      <div class="bento-item bento-5"><img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=500" alt="照片5"></div>
+      <div class="bento-item bento-1"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500" alt="1"></div>
+      <div class="bento-item bento-2"><img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500" alt="2"></div>
+      <div class="bento-item bento-3"><img src="https://images.unsplash.com/photo-1477959858617-67f30ac4ce71?w=500" alt="3"></div>
+      <div class="bento-item bento-4"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500" alt="4"></div>
+      <div class="bento-item bento-5"><img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=500" alt="5"></div>
     </div>
   </section>
 
-  <!-- ==========================================================================
-       【HTML 區塊 3：About (社團特色輪播卡)】
-       內容由最底部的 JavaScript 自動產生，請至 <script> 內修改文案。
-       ========================================================================== -->
-  <section id="about" class="section-padding">
-    <h2 class="section-title">關於我們的社團特色</h2>
+  <section class="section-padding">
+    <h2 style="font-size: 1.8rem; margin-bottom: 30px;">關於我們的社團特色</h2>
     <div class="slider-wrapper">
-      <!-- 左側切換按鈕 (白底黑字) -->
       <button class="slider-btn slider-btn-left" onclick="prevCard()">&lt;</button>
-      
-      <!-- 輪播內容容器 -->
-      <div class="card-container" id="cardContainer">
-        <!-- JS 會將卡片內容放在這裡 -->
-      </div>
-      
-      <!-- 右側切換按鈕 (白底黑字) -->
+      <div class="card-container" id="cardContainer"></div>
       <button class="slider-btn slider-btn-right" onclick="nextCard()">&gt;</button>
     </div>
   </section>
 
-  <!-- ==========================================================================
-       【HTML 區塊 4：Courses (課程簡介)】
-       若要新增課程，只需複製一份 <div class="course-card">...</div>。
-       ========================================================================== -->
-  <section id="courses" class="section-padding courses-section">
-    <h2 class="section-title">Our Courses & Workshops</h2>
-    <div class="courses-grid">
-      <div class="course-card">
-        <h3>Python & AI 開發</h3>
-        <p>從零開始學習 Python 基礎語法，並實作實用 AI 模型調用與自動化腳本。</p>
-      </div>
-      <div class="course-card">
-        <h3>Web 全端網頁開發</h3>
-        <p>掌握 HTML/CSS/JS、前端框架與 API 串接，親手打造自己的專屬網站。</p>
-      </div>
-      <div class="course-card">
-        <h3>GitHub & 開源協作</h3>
-        <p>學習 Git 版本控制、團隊專案分工，並實際參與開源社群專案維護。</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================================================================
-       【HTML 區塊 5：Activities (Google 日曆)】
-       已綁定 dsccsmu@gmail.com 之日曆。
-       ========================================================================== -->
-  <section id="activities" class="section-padding" style="text-align: center;">
-    <h2 class="section-title">社團行事曆 & 活動資訊</h2>
-    <p style="color: var(--text-gray);">檢視最新社課、工作坊與社團活動時段</p>
-    
-    <div class="calendar-container">
-      <!-- 已嵌入 dsccsmu@gmail.com 的日曆網址 -->
-      <iframe class="calendar-iframe" src="https://calendar.google.com/calendar/embed?src=dsccsmu%40gmail.com&ctz=Asia%2FTaipei"></iframe>
-    </div>
-    
-    <!-- 點擊開啓完整的 Google Calendar 頁面 -->
-    <a href="https://calendar.google.com/calendar/u/0/r?cid=dsccsmu@gmail.com" target="_blank" class="btn-google-cal">Open in Google Calendar</a>
-  </section>
-
-  <!-- ==========================================================================
-       【HTML 區塊 6：Footer 聯絡資訊欄 (給 Contact Us 跳轉錨點)】
-       設置 id="contact"，讓首頁按鈕能順利跳轉至此。
-       ========================================================================== -->
-  <footer id="contact">
+  <footer>
     <div class="footer-grid">
-      <div class="footer-col">
-        <h4>Contact Info (聯絡我們)</h4>
-        <p>📧 電子郵件：dsccsmu@gmail.com</p>
-        <p>📍 社團據點：中山醫學大學 校區專屬社團教室</p>
-        <p>📞 聯絡電話：123-456-7890</p>
+      <div>
+        <h4>Contact Info</h4>
+        <p>📧 dsccsmu@gmail.com</p>
+        <p>📍 中山醫學大學 校區社團教室</p>
       </div>
-      <div class="footer-col">
+      <div>
         <h4>Quick Links</h4>
-        <a href="#about">關於我們</a>
-        <a href="#courses">社團課程</a>
-        <a href="#activities">社團行事曆</a>
-      </div>
-      <div class="footer-col" style="text-align: right;">
-        <button class="btn-back-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">↑<br>返回頂部</button>
+        <p><a href="courses.html" style="color:#6c757d; text-decoration:none;">查看社團課程</a></p>
+        <p><a href="activities.html" style="color:#6c757d; text-decoration:none;">檢視活動行事曆</a></p>
       </div>
     </div>
-    <div class="footer-bottom">
-      &copy; 2026 Developer Student Clubs on CSMU. Managed & Powered by CSMU AI 社團
-    </div>
+    <div style="text-align:center; color:#6c757d; font-size:0.85rem;">&copy; 2026 GDGoC CSMU</div>
   </footer>
 
-  <!-- ==========================================================================
-       【JavaScript 控制程式碼區塊】
-       若想修改/新增/刪除社團卡片內容，只需修改下方的 `clubCards` 陣列即可。
-       ========================================================================== -->
   <script>
-    /* 
-     * 🛠️【幹部修改區】社團資訊卡片資料庫
-     * 如果要修改內容或增減卡片，直接修改括號內的資料即可：
-     * - img: 卡片照片網址
-     * - title: 卡片標題
-     * - desc: 卡片詳細說明
-     */
+    /* 1. 社團特色輪播資料庫 */
     const clubCards = [
-      {
-        img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600",
-        title: "跨領域學習與技術交流",
-        desc: "不論你來自什麼科系，只要對 AI 與資訊技術有興趣，這裡都有專人帶領你從零基礎踏入程式開發的世界。"
-      },
-      {
-        img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600",
-        title: "實作導向的工作坊",
-        desc: "拒絕純理論教學！我們注重動手實作，每堂課都有小型專案，幫你累積豐富的實務履歷作品集。"
-      },
-      {
-        img: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600",
-        title: "開源社群資源共享",
-        desc: "串聯業界與開源社群資源，定期舉辦經驗分享會，幫助社員取得第一手實習與專案合作機會。"
-      }
+      { img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600", title: "跨領域學習與技術交流", desc: "不論來自什麼科系，都能從零基礎踏入程式開發與 AI 領域。" },
+      { img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600", title: "實作導向工作坊", desc: "注重動手實作，每堂社課都有專案，幫你累積實務作品集。" },
+      { img: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600", title: "開源社群資源共享", desc: "串聯業界與開源社群資源，獲取第一手實習與專案合作機會。" }
     ];
-
-    let currentIndex = 0; // 當前顯示第幾張卡片
-
-    // 自動把資料印到網頁上的函式
+    let currentIndex = 0;
     function renderCard() {
-      const container = document.getElementById("cardContainer");
       const card = clubCards[currentIndex];
-      container.innerHTML = `
-        <img class="card-img" src="${card.img}" alt="${card.title}">
+      document.getElementById("cardContainer").innerHTML = `
+        <img class="card-img" src="${card.img}">
         <div class="card-content">
-          <div class="card-title">${card.title}</div>
-          <div class="card-desc">${card.desc}</div>
-        </div>
-      `;
+          <h3 style="margin-bottom:12px;">${card.title}</h3>
+          <p style="opacity:0.9; line-height:1.6;">${card.desc}</p>
+        </div>`;
     }
-
-    // 切換下一張卡片
-    function nextCard() {
-      currentIndex = (currentIndex + 1) % clubCards.length;
-      renderCard();
-    }
-
-    // 切換上一張卡片
-    function prevCard() {
-      currentIndex = (currentIndex - 1 + clubCards.length) % clubCards.length;
-      renderCard();
-    }
-
-    // 網頁載入時預設顯示第一張
+    function nextCard() { currentIndex = (currentIndex + 1) % clubCards.length; renderCard(); }
+    function prevCard() { currentIndex = (currentIndex - 1 + clubCards.length) % clubCards.length; renderCard(); }
     renderCard();
   </script>
 </body>
