@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GDGoC CSMU - 社團課程分類</title>
+  <style>
+    :root { --bg-light: #f8f9fa; --navy-dark: #0b1a30; --text-dark: #212529; --text-gray: #6c757d; --blue-accent: #0066cc; --border-color: #e9ecef; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+    body { background-color: #ffffff; color: var(--text-dark); line-height: 1.6; }
+
+    header {
+      position: sticky; top: 0; z-index: 1000;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 8%; border-bottom: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
+    }
+    .logo { font-weight: 800; font-size: 1.2rem; }
+    nav a { margin: 0 15px; text-decoration: none; color: var(--text-dark); font-weight: 500; }
+    nav a:hover, nav a.active { color: var(--blue-accent); font-weight: 700; }
+
+    .container { padding: 50px 8%; }
+    .page-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; }
+    .page-desc { color: var(--text-gray); margin-bottom: 30px; }
+
+    /* 分類篩選按鈕區塊 */
+    .filter-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+    .filter-btn {
+      padding: 8px 18px; border: 1px solid var(--border-color); background: #fff;
+      border-radius: 20px; font-weight: 600; cursor: pointer; transition: 0.2s;
+    }
+    .filter-btn.active, .filter-btn:hover { background: var(--blue-accent); color: #fff; border-color: var(--blue-accent); }
+
+    /* 課程卡片網格 */
+    .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+    .course-card {
+      background: #fff; border: 1px solid var(--border-color); border-radius: 12px;
+      padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s;
+    }
+    .course-card:hover { transform: translateY(-5px); }
+    .tag { display: inline-block; padding: 4px 10px; background: #e6f0fa; color: var(--blue-accent); font-size: 0.8rem; font-weight: 700; border-radius: 4px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">GDGoC CSMU</div>
+    <nav>
+      <a href="index.html">About (首頁)</a>
+      <a href="courses.html" class="active">Courses (課程分類)</a>
+      <a href="activities.html">Activities (社團活動)</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1 class="page-title">社團課程分類目錄</h1>
+    <p class="page-desc">選擇感興趣的技術領域，查詢相對應的社課與工作坊規劃。</p>
+
+    <!-- 7 大分類篩選按鈕 -->
+    <div class="filter-buttons">
+      <button class="filter-btn active" onclick="filterCourses('All')">全部 (All)</button>
+      <button class="filter-btn" onclick="filterCourses('Web Dev')">Web Dev</button>
+      <button class="filter-btn" onclick="filterCourses('Net Security')">Net Security</button>
+      <button class="filter-btn" onclick="filterCourses('Data Science')">Data Science</button>
+      <button class="filter-btn" onclick="filterCourses('AI Application')">AI Application</button>
+      <button class="filter-btn" onclick="filterCourses('Dev Tools')">Dev Tools</button>
+      <button class="filter-btn" onclick="filterCourses('Software Projects')">Software Projects</button>
+      <button class="filter-btn" onclick="filterCourses('UIUX Design')">UIUX Design</button>
+    </div>
+
+    <!-- 課程顯示區域 -->
+    <div class="courses-grid" id="courseGrid"></div>
+  </div>
+
+  <script>
+    /* 2. 課程資料庫 (幹部可在此自由增刪) */
+    const courses = [
+      { category: "Web Dev", title: "HTML/CSS/JS 全端基礎", desc: "網頁基本三大元素教學，建立回應式網頁版面與動態互動機制。" },
+      { category: "Net Security", title: "資安思維與 Web 漏洞實戰", desc: "認識常見 Web 安全漏洞（如 XSS、SQLi）及防護最佳實踐。" },
+      { category: "Data Science", title: "Python 資料分析入門", desc: "運用 Pandas 與 NumPy 分析視覺化數據，提取關鍵商業洞察。" },
+      { category: "AI Application", title: "LLM API 與 RAG 應用開發", desc: "學習串接 OpenAI / Gemini API 並建構自訂知識庫檢索系統。" },
+      { category: "Dev Tools", title: "Git / GitHub 開源協作", desc: "版控基本功、Branch 管理與 Pull Request 工作流實作。" },
+      { category: "Software Projects", title: "軟體專案敏捷開發實戰", desc: "分組完成可發布的軟體專案，包含敏捷開發展望與產品迭代。" },
+      { category: "UIUX Design", title: "Figma 介面設計與原型繪製", desc: "使用者體驗設計原則、Wireframe 設計與高保真原型製作。" }
+    ];
+
+    function displayCourses(data) {
+      const grid = document.getElementById("courseGrid");
+      grid.innerHTML = data.map(c => `
+        <div class="course-card">
+          <span class="tag">${c.category}</span>
+          <h3 style="margin-bottom:10px;">${c.title}</h3>
+          <p style="color:var(--text-gray); font-size:0.95rem;">${c.desc}</p>
+        </div>
+      `).join('');
+    }
+
+    function filterCourses(category) {
+      // 切換按鈕高亮
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText.includes(category) || (category === 'All' && btn.innerText.includes('全部')));
+      });
+
+      // 篩選資料
+      if (category === 'All') {
+        displayCourses(courses);
+      } else {
+        displayCourses(courses.filter(c => c.category === category));
+      }
+    }
+
+    // 預設載入全部課程
+    displayCourses(courses);
+  </script>
+</body>
+</html>
