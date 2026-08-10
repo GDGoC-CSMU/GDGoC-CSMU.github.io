@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GDGoC CSMU - 社團活動 Gallery</title>
+  <style>
+    :root { --bg-light: #f8f9fa; --navy-dark: #0b1a30; --text-dark: #212529; --text-gray: #6c757d; --blue-accent: #0066cc; --border-color: #e9ecef; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+    body { background-color: #ffffff; color: var(--text-dark); line-height: 1.6; }
+
+    header {
+      position: sticky; top: 0; z-index: 1000;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 8%; border-bottom: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
+    }
+    .logo { font-weight: 800; font-size: 1.2rem; }
+    nav a { margin: 0 15px; text-decoration: none; color: var(--text-dark); font-weight: 500; }
+    nav a:hover, nav a.active { color: var(--blue-accent); font-weight: 700; }
+
+    .container { padding: 50px 8%; }
+    .page-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; }
+    .page-desc { color: var(--text-gray); margin-bottom: 30px; }
+
+    /* Gallery 畫廊卡片網格 */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-bottom: 60px; }
+    
+    .gallery-card {
+      position: relative; height: 320px; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1); background-color: #000;
+    }
+
+    .gallery-card img {
+      width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; opacity: 0.9;
+    }
+
+    /* 懸停滑出遮罩區塊 (Hover Overlay) */
+    .gallery-overlay {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(11, 26, 48, 0.92); color: white; padding: 25px;
+      transform: translateY(80%); transition: transform 0.35s ease-in-out;
+      display: flex; flex-direction: column;
+    }
+
+    /* 滑鼠移入時，整個遮罩推上來 */
+    .gallery-card:hover .gallery-overlay { transform: translateY(0); }
+    .gallery-card:hover img { transform: scale(1.08); }
+
+    .gallery-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 15px; height: 35px; flex-shrink: 0; }
+    
+    /* 內文區域：開啟 Scrollbar 滾動條關鍵 */
+    .gallery-desc {
+      font-size: 0.95rem; line-height: 1.6; opacity: 0.9;
+      overflow-y: auto; padding-right: 8px; flex-grow: 1;
+    }
+
+    /* 自訂 Scrollbar 美化 */
+    .gallery-desc::-webkit-scrollbar { width: 5px; }
+    .gallery-desc::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 4px; }
+
+    /* 行事曆容器 */
+    .calendar-container { max-width: 900px; margin: 30px auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .calendar-iframe { width: 100%; height: 500px; border: 0; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">GDGoC CSMU</div>
+    <nav>
+      <a href="index.html">About (首頁)</a>
+      <a href="courses.html">Courses (課程分類)</a>
+      <a href="activities.html" class="active">Activities (社團活動)</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1 class="page-title">社團活動 Gallery 畫廊</h1>
+    <p class="page-desc">將滑鼠移至圖片上方，即可檢視活動詳細內容與精采記錄。</p>
+
+    <!-- Gallery 資訊卡列表 -->
+    <div class="gallery-grid" id="galleryGrid"></div>
+
+    <h2 style="font-size: 1.8rem; text-align: center; margin-top: 40px;">社團 Google 行事曆</h2>
+    <div class="calendar-container">
+      <iframe class="calendar-iframe" src="https://calendar.google.com/calendar/embed?src=dsccsmu%40gmail.com&ctz=Asia%2FTaipei"></iframe>
+    </div>
+  </div>
+
+  <script>
+    /* 3. 社團活動資料庫 */
+    const activities = [
+      {
+        img: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600",
+        title: "Google Solution Challenge 研討會",
+        desc: "每年一度的 Google 全球學生挑戰賽！我們邀請歷屆獲獎團隊分享如何運用 Google 技術解決聯合國 17 項永續發展目標 (SDGs) 的痛點，並進行現場提案黑客松練習。"
+      },
+      {
+        img: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600",
+        title: "開源黑客松實戰營 (Hackathon)",
+        desc: "連續 24 小時的程式開發狂歡！與跨科系夥伴組隊，從發想到完成 Prototype，現場備有充足零食與專業 Mentor 隨時指導，體驗最純粹的黑客精神。"
+      },
+      {
+        img: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=600",
+        title: "期末專案發表會 & 社員聚餐",
+        desc: "展現整學期學習成果的時間！社員將發表各自的軟體專案、AI 應用或是 Web 成果，現場設有最佳人氣獎投票，並備有豐盛餐點交流。"
+      }
+    ];
+
+    document.getElementById("galleryGrid").innerHTML = activities.map(a => `
+      <div class="gallery-card">
+        <img src="${a.img}" alt="${a.title}">
+        <div class="gallery-overlay">
+          <div class="gallery-title">${a.title}</div>
+          <div class="gallery-desc">${a.desc}</div>
+        </div>
+      </div>
+    `).join('');
+  </script>
+</body>
+</html>
