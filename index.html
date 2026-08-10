@@ -9,10 +9,11 @@
     :root {
       --bg-light: #f8f9fa;
       --navy-dark: #0b1a30;
-      --text-dark: #212529;
-      --text-gray: #6c757d;
+      --text-dark: #111111;       /* 接近純黑的文字顏色 */
+      --text-gray: #555555;       /* 灰色內文 */
       --blue-accent: #0066cc;
-      --border-color: #e9ecef;
+      --border-color: #e0e0e0;
+      --footer-bg: #e8e8e8;       /* 依據圖一還原淺灰頁尾背景 */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
@@ -25,17 +26,33 @@
       padding: 18px 8%; border-bottom: 1px solid var(--border-color);
       background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
     }
-    .logo { font-weight: 800; font-size: 1.2rem; }
-    nav a { margin: 0 15px; text-decoration: none; color: var(--text-dark); font-weight: 500; transition: color 0.2s; }
+    .logo { font-weight: 800; font-size: 1.1rem; letter-spacing: 0.5px; }
+    
+    nav { display: flex; gap: 20px; }
+    nav a { text-decoration: none; color: var(--text-dark); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
     nav a:hover, nav a.active { color: var(--blue-accent); font-weight: 700; }
 
-    /* Hero 區塊 */
-    .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 60px 8%; align-items: start; }
-    .hero-left h1 { font-size: 3rem; line-height: 1.15; font-weight: 800; margin-bottom: 15px; }
-    .hero-left .subtitle { color: var(--blue-accent); font-size: 1.2rem; font-weight: 600; margin-bottom: 30px; }
-    .btn-contact { padding: 12px 28px; background-color: var(--blue-accent); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+    .header-right { display: flex; align-items: center; gap: 20px; font-size: 0.95rem; }
+    .btn-quote {
+      padding: 8px 18px; border: 1.5px solid var(--text-dark);
+      background: transparent; font-weight: 600; cursor: pointer; transition: 0.2s;
+    }
+    .btn-quote:hover { background: var(--text-dark); color: #fff; }
 
-    /* Bento Grid */
+    /* Hero 主視覺區塊 */
+    .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 60px 8%; align-items: start; }
+    .hero-left h1 { font-size: 3rem; line-height: 1.15; font-weight: 800; margin-bottom: 15px; color: #000; }
+    
+    /* 依據要求：將「中山醫學大學」那行字設為黑色 */
+    .hero-left .subtitle { color: #000000; font-size: 1.15rem; font-weight: 700; margin-bottom: 30px; }
+    
+    .btn-contact {
+      padding: 12px 28px; background-color: var(--blue-accent); color: white;
+      border: none; border-radius: 6px; font-size: 1rem; font-weight: 600;
+      cursor: pointer; text-decoration: none; display: inline-block;
+    }
+
+    /* Bento Grid (右側 5 張照片) */
     .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 180px); gap: 12px; }
     .bento-item { border-radius: 12px; overflow: hidden; background-color: #eee; }
     .bento-item img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: filter 0.3s; }
@@ -52,34 +69,96 @@
     .card-container { display: flex; border-radius: 16px; overflow: hidden; background-color: var(--navy-dark); color: white; min-height: 320px; }
     .card-img { width: 45%; object-fit: cover; }
     .card-content { width: 55%; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
-    .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 90px; border: none; font-size: 1.5rem; font-weight: bold; cursor: pointer; background: #fff; color: #333; z-index: 10; }
+    
+    /* 兩側切換按鈕 (白底黑箭頭) */
+    .slider-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 42px; height: 90px; border: none; font-size: 1.5rem; font-weight: bold;
+      cursor: pointer; background: #ffffff; color: #333333; z-index: 10; transition: background 0.2s;
+    }
+    .slider-btn:hover { background-color: #f0f0f0; }
     .slider-btn-left { left: -21px; box-shadow: 2px 0 10px rgba(0,0,0,0.15); border-radius: 6px 0 0 6px; }
     .slider-btn-right { right: -21px; box-shadow: -2px 0 10px rgba(0,0,0,0.15); border-radius: 0 6px 6px 0; }
 
-    /* Footer */
-    footer { background-color: #f1f3f5; padding: 50px 8% 20px; border-top: 1px solid var(--border-color); }
-    .footer-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-bottom: 40px; }
+    /* ==========================================================================
+       【依據圖一完整還原：Wix 風格頁尾 Footer】
+       ========================================================================== */
+    footer {
+      background-color: var(--footer-bg);
+      color: var(--text-dark);
+      padding: 60px 8% 30px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.95rem;
+    }
+
+    .footer-main {
+      display: grid;
+      grid-template-columns: 2fr 2fr 1fr;
+      gap: 40px;
+      align-items: start;
+      margin-bottom: 60px;
+    }
+
+    .footer-left-top p { margin-bottom: 6px; }
+    .footer-left-bottom { margin-top: 60px; color: var(--text-gray); font-size: 0.9rem; }
+
+    /* 中間條款選單 (帶底線風格) */
+    .footer-center a {
+      display: block;
+      color: var(--text-dark);
+      text-decoration: underline;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    /* 右側返回頂部箭頭按鈕 */
+    .footer-right { text-align: right; }
+    .btn-back-top {
+      background: transparent;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      color: var(--text-dark);
+      transition: transform 0.2s;
+    }
+    .btn-back-top:hover { transform: translateY(-4px); }
+
+    .footer-copyright {
+      border-top: 1px solid #d0d0d0;
+      padding-top: 20px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-gray);
+    }
+    .footer-copyright a { color: var(--text-dark); }
   </style>
 </head>
 <body>
 
-  <!-- 導覽列：透過實體檔案連結切換 -->
+  <!-- 頂部 Header 導覽列 -->
   <header>
-    <div class="logo">GDGoC CSMU</div>
+    <div class="logo">BRIGHTNEST HOMEWORKS</div>
     <nav>
-      <a href="index.html" class="active">About (首頁)</a>
-      <a href="courses.html">Courses (課程分類)</a>
-      <a href="activities.html">Activities (社團活動)</a>
+      <a href="index.html" class="active">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="activities.html">Activities</a>
     </nav>
+    <div class="header-right">
+      <span>123-456-7890</span>
+      <button class="btn-quote" onclick="location.href='#contact'">Get a Quote</button>
+    </div>
   </header>
 
+  <!-- Hero 主視覺區塊 -->
   <section class="hero">
     <div class="hero-left">
       <h1>Developer<br>Student Clubs<br>on CSMU</h1>
+      <!-- 「中山醫學大學」已改成黑色 -->
       <div class="subtitle">中山醫學大學 AI與開源資訊社</div>
-      <a href="activities.html" class="btn-contact">探索社團活動</a>
+      <a href="activities.html" class="btn-contact">Contact Us</a>
     </div>
     
+    <!-- 右側 5 方塊 Bento Grid -->
     <div class="bento-grid">
       <div class="bento-item bento-1"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500" alt="1"></div>
       <div class="bento-item bento-2"><img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500" alt="2"></div>
@@ -89,6 +168,7 @@
     </div>
   </section>
 
+  <!-- 社團特色輪播卡片 -->
   <section class="section-padding">
     <h2 style="font-size: 1.8rem; margin-bottom: 30px;">關於我們的社團特色</h2>
     <div class="slider-wrapper">
@@ -98,24 +178,43 @@
     </div>
   </section>
 
-  <footer>
-    <div class="footer-grid">
+<!-- 按圖一完全還原：簡約風格 Footer 區塊 -->
+  <footer id="contact">
+    <div class="footer-main">
+      <!-- 左側欄位：聯絡資料與地址 -->
       <div>
-        <h4>Contact Info</h4>
-        <p>📧 dsccsmu@gmail.com</p>
-        <p>📍 中山醫學大學 校區社團教室</p>
+        <div class="footer-left-top">
+          <p>123-456-7890</p>
+          <p>dsccsmu@gmail.com</p>
+        </div>
+        <div class="footer-left-bottom">
+          <p>中山醫學大學 校區專屬社團教室</p>
+          <p>Taichung, Taiwan</p>
+        </div>
       </div>
-      <div>
-        <h4>Quick Links</h4>
-        <p><a href="courses.html" style="color:#6c757d; text-decoration:none;">查看社團課程</a></p>
-        <p><a href="activities.html" style="color:#6c757d; text-decoration:none;">檢視活動行事曆</a></p>
+
+      <!-- 中間欄位：條款與隱私聲明 -->
+      <div class="footer-center">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Accessibility Statement</a>
+        <a href="#">Terms & Conditions</a>
+        <a href="#">Refund Policy</a>
+      </div>
+
+      <!-- 右側欄位：返回頂部箭頭 -->
+      <div class="footer-right">
+        <button class="btn-back-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'});" title="返回頂部">↑</button>
       </div>
     </div>
-    <div style="text-align:center; color:#6c757d; font-size:0.85rem;">&copy; 2026 GDGoC CSMU</div>
+
+    <!-- 底部版權聲明 (已更新) -->
+    <div class="footer-copyright">
+      &copy; 2026 by CSMU GDGoC
+    </div>
   </footer>
 
   <script>
-    /* 1. 社團特色輪播資料庫 */
+    /* 社團特色輪播資料庫 */
     const clubCards = [
       { img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600", title: "跨領域學習與技術交流", desc: "不論來自什麼科系，都能從零基礎踏入程式開發與 AI 領域。" },
       { img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600", title: "實作導向工作坊", desc: "注重動手實作，每堂社課都有專案，幫你累積實務作品集。" },
