@@ -6,41 +6,32 @@
   <title>Developer Student Clubs on CSMU - 中山醫學大學 AI與開源資訊社</title>
   
   <style>
-    /* ==========================================================================
-       【1. 網站整體視覺風格設定 (Global Styles)】
-       這裡控制全站的顏色、字型與平滑滾動。
-       ========================================================================== */
+    /*【一】網站整體視覺風格設定 (顏色、字型、平滑滾動等)*/
     :root {
-      --bg-light: #f8f9fa;        /* 淺灰背景色 */
-      --navy-dark: #0b1a30;       /* 深藍色 (卡片與主按鈕背景) */
-      --text-dark: #212529;       /* 主要文字顏色 (接近黑) */
-      --text-gray: #6c757d;       /* 次要文字顏色 (灰色) */
-      --blue-accent: #0066cc;     /* 品牌藍色 (強調文字/按鈕) */
-      --border-color: #e9ecef;    /* 邊框顏色 */
+      --bg-light: #f8f9fa;      /*淺灰:背景*/
+      --navy-dark: #0b1a30;     /*深藍:卡片、主按鈕背景*/
+      --text-dark: #212529;     /*黑色:主要文字顏色*/
+      --text-gray: #6c757d;     /*灰色:次要文字顏色*/
+      --blue-accent: #0066cc;   /*藍色:強調文字/按鈕*/
+      --border-color: #e9ecef;  /*邊框顏色*/
     }
-
-    /* 單頁平滑滾動關鍵設定 */
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: 80px; /* 定位時預留頂部導覽列高度，防止標題被遮住 */
+      scroll-padding-top: 80px;
     }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     }
-
     body {
       background-color: #ffffff;
       color: var(--text-dark);
       line-height: 1.6;
     }
 
-    /* ==========================================================================
-       【2. 頂部固定導覽列 (Header Navigation)】
-       ========================================================================== */
+    /*頂部固定導覽列*/
     header {
       position: sticky;
       top: 0;
@@ -51,7 +42,7 @@
       padding: 18px 8%;
       border-bottom: 1px solid var(--border-color);
       background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px); /* 毛玻璃效果 */
+      backdrop-filter: blur(8px);
     }
 
     .logo {
@@ -92,9 +83,7 @@
       color: #fff;
     }
 
-    /* ==========================================================================
-       【3. 首頁 Hero 區塊與 5 方塊 Bento Grid】
-       ========================================================================== */
+    /*首頁Hero*/
     .hero {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -102,18 +91,15 @@
       padding: 60px 8%;
       align-items: start;
     }
-
     .hero-left {
-      padding-top: 10px; /* 標題上移，視覺更平衡 */
+      padding-top: 10px;
     }
-
     .hero-left h1 {
       font-size: 3rem;
       line-height: 1.15;
       font-weight: 800;
       margin-bottom: 15px;
     }
-
     .hero-left .subtitle {
       color: var(--blue-accent);
       font-size: 1.2rem;
@@ -133,13 +119,11 @@
       box-shadow: 0 4px 12px rgba(0,102,204,0.2);
       transition: background-color 0.2s;
     }
-
     .btn-contact:hover {
       background-color: #004d99;
     }
-
-    /* 5 方塊 Bento Grid (網格) 控制 */
-    .bento-grid {
+    
+    .bento-grid { /*網格控制*/
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(2, 180px);
@@ -171,9 +155,7 @@
     .bento-4 { grid-column: 3 / 4; grid-row: 1 / 2; }
     .bento-5 { grid-column: 3 / 4; grid-row: 2 / 3; }
 
-    /* ==========================================================================
-       【4. 區塊一：About 社團特色資訊輪播卡】
-       ========================================================================== */
+    /*社團特色資訊卡*/
     .section-padding {
       padding: 80px 8%;
     }
@@ -225,7 +207,6 @@
       opacity: 0.9;
     }
 
-    /* 左右切換按鈕（兩側皆改為白色背景） */
     .slider-btn {
       position: absolute;
       top: 50%;
@@ -261,35 +242,7 @@
       border-radius: 0 6px 6px 0;
     }
 
-    /* ==========================================================================
-       【5. 區塊二：Courses 課程卡片】
-       ========================================================================== */
-    .courses-section {
-      background-color: var(--bg-light);
-    }
-
-    .courses-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .course-card {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }
-
-    .course-card h3 {
-      margin-bottom: 10px;
-      color: var(--blue-accent);
-    }
-
-    /* ==========================================================================
-       【6. 區塊三：Activities 行事曆】
-       ========================================================================== */
+    /*行事曆*/
     .calendar-container {
       max-width: 900px;
       margin: 30px auto 0;
@@ -321,9 +274,7 @@
       opacity: 0.9;
     }
 
-    /* ==========================================================================
-       【7. 頁尾 Footer 聯絡資訊】
-       ========================================================================== */
+    /*頁尾聯絡資訊*/
     footer {
       background-color: #f1f3f5;
       padding: 50px 8% 20px;
