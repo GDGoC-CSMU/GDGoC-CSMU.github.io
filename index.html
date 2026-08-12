@@ -5,124 +5,155 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GDGoC CSMU - 社團首頁</title>
   <style>
-    /* 全局變數 */
+    /* 全局變數：完全依照附圖配色設定 */
     :root {
       --bg-light: #f8f9fa;
-      --navy-dark: #0b1a30;
-      --text-dark: #111111;
-      --text-gray: #555555;
-      --blue-accent: #0066cc;
+      --heading-dark: #211510;    /* 附圖的大標題深棕黑色 */
+      --text-gray: #555555;       /* 副標題與說明文字灰色 */
+      --blue-accent: #0073e6;     /* 附圖 Contact Us 鮮豔藍色 */
       --border-color: #e0e0e0;
       --footer-bg: #e8e8e8;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-    body { background-color: #ffffff; color: var(--text-dark); line-height: 1.6; }
+    /* 基礎重置：使用簡約經典無襯線字型 */
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; 
+      box-shadow: none !important; /* 強制全站無陰影，保持清爽 */
+    }
+    
+    body { background-color: #ffffff; color: var(--heading-dark); line-height: 1.5; }
 
     /* 固定頁首導覽列 */
     header {
       position: sticky; top: 0; z-index: 1000;
       display: flex; justify-content: space-between; align-items: center;
-      padding: 18px 8%; border-bottom: 1px solid var(--border-color);
-      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
+      padding: 20px 8%; border-bottom: 1px solid var(--border-color);
+      background: #ffffff;
     }
-    .logo { font-weight: 800; font-size: 1.1rem; letter-spacing: 0.5px; }
+    .logo { font-weight: 700; font-size: 1.15rem; letter-spacing: 0.5px; color: var(--heading-dark); }
     
-    nav { display: flex; gap: 20px; }
-    nav a { text-decoration: none; color: var(--text-dark); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
-    nav a:hover, nav a.active { color: var(--blue-accent); font-weight: 700; }
+    nav { display: flex; gap: 24px; }
+    nav a { text-decoration: none; color: var(--heading-dark); font-size: 0.95rem; font-weight: 500; }
+    nav a:hover, nav a.active { color: var(--blue-accent); }
 
     .header-right { display: flex; align-items: center; gap: 20px; font-size: 0.95rem; }
     .btn-quote {
-      padding: 8px 18px; border: 1.5px solid var(--text-dark);
-      background: transparent; font-weight: 600; cursor: pointer; transition: 0.2s;
+      padding: 8px 18px; border: 1.5px solid var(--heading-dark);
+      background: transparent; font-weight: 600; cursor: pointer; color: var(--heading-dark);
     }
-    .btn-quote:hover { background: var(--text-dark); color: #fff; }
 
     /* Hero 主視覺區塊 */
-    .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 60px 8%; align-items: center; }
-    .hero-left h1 { font-size: 3rem; line-height: 1.15; font-weight: 800; margin-bottom: 15px; color: #000; }
+    .hero { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 20px; 
+      padding: 50px 8%; 
+      align-items: start; 
+    }
     
-    /* 修正：副標題強制為黑色 */
-    .hero-left .subtitle { color: #000000 !important; font-size: 1.15rem; font-weight: 700; margin-bottom: 30px; }
+    /* 附圖字體與顏色 */
+    .hero-left h1 { 
+      font-size: 3.2rem; 
+      line-height: 1.08; 
+      font-weight: 800; 
+      margin-bottom: 20px; 
+      color: var(--heading-dark); 
+      letter-spacing: -0.5px;
+    }
+    
+    .hero-left .subtitle { 
+      color: var(--text-gray); 
+      font-size: 1rem; 
+      font-weight: 500; 
+      margin-bottom: 30px; 
+    }
     
     .btn-contact {
-      padding: 12px 28px; background-color: var(--blue-accent); color: white;
-      border: none; border-radius: 6px; font-size: 1rem; font-weight: 600;
-      cursor: pointer; text-decoration: none; display: inline-block;
+      padding: 10px 32px; 
+      background-color: var(--blue-accent); 
+      color: white;
+      border: none; 
+      border-radius: 0px; /* 扁平直角 */
+      font-size: 0.95rem; 
+      font-weight: 600;
+      cursor: pointer; 
+      text-decoration: none; 
+      display: inline-block;
     }
 
-    /* 點點矩陣背景與散落照片 */
+    /* 點點矩陣背景與靜態散落照片 (無懸浮/無陰影) */
     .scatter-grid {
       position: relative;
       width: 100%;
-      height: 400px;
-      border-radius: 12px;
-      /* 密集點點背景 */
+      height: 420px;
+      /* 清爽點點矩陣背景 (間隔 40px，點大小 2px) */
       background-image: radial-gradient(#aaa 1.5px, transparent 1.5px);
-      background-size: 30px 30px;
+      background-size: 40px 40px;
       background-position: 0 0;
     }
 
     .photo-card {
       position: absolute;
-      width: 100px;
-      height: 100px;
-      border-radius: 4px;
+      width: 80px;
+      height: 80px;
       overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transition: transform 0.3s ease;
+      border: none; /* 完全無邊框無陰影 */
     }
 
-    .photo-card img { width: 100%; height: 100%; object-fit: cover; }
-    .photo-card:hover { transform: scale(1.1); z-index: 10; }
+    .photo-card img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      display: block;
+    }
 
-    /* 4 張照片的散落座標 */
-    .photo-1 { top: 30px;  left: 180px; }
-    .photo-2 { top: 120px; left: 340px; }
-    .photo-3 { top: 220px; left: 40px;  }
-    .photo-4 { top: 240px; left: 220px; }
+    /* 📍 依據附圖精確散落位置 */
+    .photo-1 { top: 40px;  left: 120px; } /* 上偏中 */
+    .photo-2 { top: 120px; left: 360px; } /* 右上 */
+    .photo-3 { top: 240px; left: 0px;   } /* 左下 */
+    .photo-4 { top: 240px; left: 280px; } /* 右下偏中 */
 
     /* 社團特色輪播區塊 */
-    .section-padding { padding: 80px 8%; }
+    .section-padding { padding: 70px 8%; }
     .slider-wrapper { position: relative; max-width: 900px; margin: 0 auto; }
-    .card-container { display: flex; border-radius: 16px; overflow: hidden; background-color: var(--navy-dark); color: white; min-height: 320px; }
+    .card-container { display: flex; background-color: #0c1829; color: white; min-height: 300px; }
     .card-img { width: 45%; object-fit: cover; }
     .card-content { width: 55%; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
     
     .slider-btn {
       position: absolute; top: 50%; transform: translateY(-50%);
-      width: 42px; height: 90px; border: none; font-size: 1.5rem; font-weight: bold;
-      cursor: pointer; background: #ffffff; color: #333333; z-index: 10; transition: background 0.2s;
+      width: 40px; height: 80px; border: 1px solid var(--border-color); font-size: 1.2rem;
+      cursor: pointer; background: #ffffff; color: #333333; z-index: 10;
     }
-    .slider-btn:hover { background-color: #f0f0f0; }
-    .slider-btn-left { left: -21px; box-shadow: 2px 0 10px rgba(0,0,0,0.15); border-radius: 6px 0 0 6px; }
-    .slider-btn-right { right: -21px; box-shadow: -2px 0 10px rgba(0,0,0,0.15); border-radius: 0 6px 6px 0; }
+    .slider-btn-left { left: -20px; }
+    .slider-btn-right { right: -20px; }
 
     /* 日曆區塊 */
     .calendar-container {
       max-width: 900px; margin: 30px auto 0; background: #fff;
-      border-radius: 12px; overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid var(--border-color);
+      overflow: hidden; border: 1px solid var(--border-color);
     }
-    .calendar-iframe { width: 100%; height: 500px; border: 0; }
+    .calendar-iframe { width: 100%; height: 480px; border: 0; }
     .btn-google-cal {
       display: inline-block; margin-top: 20px; padding: 10px 20px;
-      background-color: var(--navy-dark); color: white; text-decoration: none;
-      border-radius: 6px; font-weight: 600; font-size: 0.9rem;
+      background-color: var(--heading-dark); color: white; text-decoration: none;
+      font-weight: 600; font-size: 0.9rem;
     }
 
     /* Footer 頁尾 */
     footer {
-      background-color: var(--footer-bg); color: var(--text-dark);
-      padding: 60px 8% 30px; border-top: 1px solid var(--border-color); font-size: 0.95rem;
+      background-color: var(--footer-bg); color: var(--heading-dark);
+      padding: 50px 8% 30px; border-top: 1px solid var(--border-color); font-size: 0.95rem;
     }
-    .footer-main { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 40px; align-items: start; margin-bottom: 60px; }
+    .footer-main { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 40px; align-items: start; margin-bottom: 50px; }
     .footer-left-top p { margin-bottom: 6px; }
-    .footer-left-bottom { margin-top: 60px; color: var(--text-gray); font-size: 0.9rem; }
-    .footer-center a { display: block; color: var(--text-dark); text-decoration: underline; margin-bottom: 10px; font-weight: 500; }
+    .footer-left-bottom { margin-top: 40px; color: var(--text-gray); font-size: 0.9rem; }
+    .footer-center a { display: block; color: var(--heading-dark); text-decoration: underline; margin-bottom: 10px; font-weight: 500; }
     .footer-right { text-align: right; }
-    .btn-back-top { background: transparent; border: none; font-size: 2rem; cursor: pointer; color: var(--text-dark); }
+    .btn-back-top { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--heading-dark); }
     .footer-copyright { border-top: 1px solid #d0d0d0; padding-top: 20px; text-align: center; font-size: 0.85rem; color: var(--text-gray); }
   </style>
 </head>
@@ -142,7 +173,7 @@
     </div>
   </header>
 
-  <!-- Hero 主視覺區塊 (黑字 + 點點背景散落照片) -->
+  <!-- Hero 主視覺區塊 (完全對齊附圖字體與視覺) -->
   <section class="hero">
     <div class="hero-left">
       <h1>Developer<br>Student Clubs<br>on CSMU</h1>
@@ -150,7 +181,7 @@
       <a href="#contact" class="btn-contact">Contact Us</a>
     </div>
     
-    <!-- 右側點點背景與散落照片 -->
+    <!-- 右側點點矩陣與無動畫靜態散落照片 -->
     <div class="scatter-grid">
       <div class="photo-card photo-1"><img src="https://picsum.photos/id/1018/200/200" alt="照片1"></div>
       <div class="photo-card photo-2"><img src="https://picsum.photos/id/1015/200/200" alt="照片2"></div>
@@ -161,7 +192,7 @@
 
   <!-- 社團特色輪播 -->
   <section class="section-padding">
-    <h2 style="font-size: 1.8rem; margin-bottom: 30px;">關於我們的社團特色</h2>
+    <h2 style="font-size: 1.8rem; margin-bottom: 30px; color: var(--heading-dark);">關於我們的社團特色</h2>
     <div class="slider-wrapper">
       <button class="slider-btn slider-btn-left" onclick="prevCard()">&lt;</button>
       <div class="card-container" id="cardContainer"></div>
@@ -169,9 +200,9 @@
     </div>
   </section>
 
-  <!-- 日曆區塊 -->
+  <!-- 社團日曆 -->
   <section class="section-padding" style="background-color: var(--bg-light); text-align: center;">
-    <h2 style="font-size: 1.8rem; margin-bottom: 10px;">社團行事曆 & 活動時間</h2>
+    <h2 style="font-size: 1.8rem; margin-bottom: 10px; color: var(--heading-dark);">社團行事曆 & 活動時間</h2>
     <p style="color: var(--text-gray);">歡迎查閱最新的社課、工作坊與活動安排</p>
     
     <div class="calendar-container">
@@ -181,7 +212,7 @@
     <a href="https://calendar.google.com/calendar/u/0/r?cid=dsccsmu@gmail.com" target="_blank" class="btn-google-cal">在 Google Calendar 中開啟</a>
   </section>
 
-  <!-- Footer 區塊 -->
+  <!-- Footer 頁尾 -->
   <footer id="contact">
     <div class="footer-main">
       <div>
@@ -225,7 +256,7 @@
         <img class="card-img" src="${card.img}">
         <div class="card-content">
           <h3 style="margin-bottom:12px;">${card.title}</h3>
-          <p style="opacity:0.9; line-height:1.6;">${card.desc}</p>
+          <p style="opacity:0.85; line-height:1.6; font-size:0.95rem;">${card.desc}</p>
         </div>`;
     }
     function nextCard() { currentIndex = (currentIndex + 1) % clubCards.length; renderCard(); }
