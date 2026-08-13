@@ -5,59 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GDGoC CSMU</title>
   <style>
-    /* 請複製 index.html 的共用樣式 (如 :root, header, nav 等) */
+    /* 請複製 index.html 的共用樣式 */
     /* ... 共用 CSS 略 ... */
 
-    /* 課程卡片區塊 */
-    .courses-section { padding: 80px 8%; }
-    .courses-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-      gap: 30px; 
-    }
+    .activities-section { padding: 80px 8%; }
     
-    .course-card {
-      position: relative; /* 為了讓隱藏內容絕對定位 */
-      background: #fff;
+    /* 兩排排列的 Grid 設定 */
+    .activities-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* 強制兩欄 */
+      gap: 40px; /* 卡片間距 */
+    }
+
+    /* 長方形無圓角卡片 */
+    .activity-card {
       border: 1px solid var(--border-color);
-      height: 250px;
-      overflow: hidden; /* 隱藏溢出的內容 */
-      cursor: default;
-    }
-    
-    /* 預設顯示的簡略內容 */
-    .course-summary {
-      padding: 30px;
-      height: 100%;
+      border-radius: 0; /* 無圓角 */
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      transition: opacity 0.3s;
     }
     
-    .course-summary h3 { margin-bottom: 15px; color: var(--heading-dark); }
-    
-    /* 滑鼠 Hover 時浮現的完整內容 */
-    .course-details {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: var(--blue-accent);
-      color: white;
-      padding: 30px;
-      opacity: 0; /* 預設隱藏 */
-      transform: translateY(20px); /* 稍微往下移 */
-      transition: all 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+    .activity-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 0; /* 確保圖片也無圓角 */
     }
     
-    /* Hover 觸發效果 */
-    .course-card:hover .course-summary { opacity: 0; } /* 隱藏原內容 */
-    .course-card:hover .course-details { 
-      opacity: 1; 
-      transform: translateY(0); /* 歸位浮現 */
+    .activity-info {
+      padding: 20px;
+      background: #fff;
     }
+    
+    .activity-date {
+      color: var(--text-gray);
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+    
+    .activity-title { margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -66,35 +53,51 @@
     <div class="logo"><a href="index.html">AI與開源資訊社(´・ω・`)</a></div>
     <nav>
       <a href="about.html">About</a>
-      <a href="courses.html" class="active">Courses</a> <!-- active 在這裡 -->
-      <a href="activities.html">Activities</a>
+      <a href="courses.html">Courses</a>
+      <a href="activities.html" class="active">Activities</a> <!-- active 在這裡 -->
     </nav>
   </header>
 
-  <section class="courses-section">
-    <h2 style="margin-bottom: 40px;">Our Courses</h2>
-    <div class="courses-grid">
-      <!-- 卡片 1 -->
-      <div class="course-card">
-        <div class="course-summary">
-          <h3>網頁前端基礎</h3>
-          <p>HTML, CSS, JavaScript 入門。</p>
-        </div>
-        <div class="course-details">
-          <h3 style="margin-bottom: 10px; color: white;">網頁前端基礎</h3>
-          <p style="font-size: 0.9rem;">這門課將帶你從零開始，學習如何建構網頁結構、美化版面，並加入簡單的互動效果。適合完全沒有程式基礎的同學。</p>
+  <section class="activities-section">
+    <h2 style="margin-bottom: 40px;">Activity Records</h2>
+    <div class="activities-grid">
+      <!-- 活動 1 -->
+      <div class="activity-card">
+        <img src="https://picsum.photos/id/1018/600/300" alt="活動照片">
+        <div class="activity-info">
+          <span class="activity-date">2026-03-15</span>
+          <h3 class="activity-title">春季技術論壇</h3>
+          <p>邀請業界講師分享最新 AI 發展趨勢。</p>
         </div>
       </div>
       
-      <!-- 卡片 2 -->
-      <div class="course-card">
-        <div class="course-summary">
-          <h3>Python 資料爬蟲</h3>
-          <p>學習擷取網路資料。</p>
+      <!-- 活動 2 -->
+      <div class="activity-card">
+        <img src="https://picsum.photos/id/1015/600/300" alt="活動照片">
+        <div class="activity-info">
+          <span class="activity-date">2026-04-20</span>
+          <h3 class="activity-title">黑客松實作營</h3>
+          <p>24小時不間斷，從創意發想到 Prototype 實作。</p>
         </div>
-        <div class="course-details">
-          <h3 style="margin-bottom: 10px; color: white;">Python 資料爬蟲</h3>
-          <p style="font-size: 0.9rem;">使用 Requests 和 BeautifulSoup 等套件，教你如何自動化收集網頁上的公開資訊，並進行初步的資料整理。</p>
+      </div>
+      
+      <!-- 活動 3 -->
+      <div class="activity-card">
+        <img src="https://picsum.photos/id/1019/600/300" alt="活動照片">
+        <div class="activity-info">
+          <span class="activity-date">2026-05-10</span>
+          <h3 class="activity-title">期中社員大會</h3>
+          <p>回顧上半學期成果與下半學期規劃。</p>
+        </div>
+      </div>
+      
+      <!-- 活動 4 -->
+      <div class="activity-card">
+        <img src="https://picsum.photos/id/1025/600/300" alt="活動照片">
+        <div class="activity-info">
+          <span class="activity-date">2026-06-05</span>
+          <h3 class="activity-title">期末專案發表</h3>
+          <p>展示這學期各組的實作成果。</p>
         </div>
       </div>
     </div>
