@@ -11,7 +11,10 @@
     --text-gray: #555555;
     --blue-accent: #0073e6;
     --border-color: #e0e0e0;
-    --footer-bg: #e8e8e8;
+    --footer-bg: #2b2b2b;
+    --footer-text: #f0f0f0;
+    --footer-text-muted: #a8a8a8;
+    --footer-border: #3f3f3f;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0;
@@ -31,7 +34,6 @@
   nav a { text-decoration: none; color: var(--heading-dark); font-size: 0.95rem; font-weight: 500; }
   nav a:hover, nav a.active { color: var(--blue-accent); }
 
-  /* ===== 主要內容：側欄 + 卡片網格 ===== */
   main { padding: 50px 8% 80px; }
   main h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
   main > .page-desc { color: var(--text-gray); margin-bottom: 40px; }
@@ -84,7 +86,6 @@
     text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
   .course-card .card-name { font-weight: 700; font-size: 1rem; }
 
-  /* ===== 懸停：卡片內浮出簡介與相關連結 ===== */
   .course-info-overlay {
     position: absolute; inset: 0;
     display: flex; flex-direction: column; justify-content: flex-end;
@@ -106,7 +107,7 @@
     color: #9fc9ff; margin-bottom: 8px;
   }
   .course-info-overlay h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
-  .course-info-overlay p { font-size: 0.82rem; line-height: 1.6; opacity: 0.9; margin-bottom: 14px; }
+  .course-info-overlay p { font-size: 0.82rem; line-height: 1.6; opacity: 0.9; margin-bottom: 14px; white-space: pre-line; }
   .course-info-overlay .overlay-link {
     align-self: flex-start; font-size: 0.8rem; font-weight: 600; color: #fff;
     text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.6); padding-bottom: 2px;
@@ -123,13 +124,29 @@
     padding: 70px 20px;
   }
 
-  /* ===== Footer ===== */
+  /* ===== Footer（全站統一：深灰底、淺色文字） ===== */
   footer {
-    background-color: var(--footer-bg); color: var(--heading-dark);
-    padding: 50px 8% 30px; border-top: 1px solid var(--border-color); font-size: 0.95rem;
+    background-color: var(--footer-bg); color: var(--footer-text);
+    padding: 50px 8% 30px; border-top: 1px solid var(--footer-border); font-size: 0.95rem;
   }
-  .footer-copyright { border-top: 1px solid #d0d0d0; padding-top: 20px; text-align: center;
-    font-size: 0.85rem; color: var(--text-gray); margin-top: 40px; }
+  .footer-main { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 40px; align-items: start; margin-bottom: 50px; }
+  .footer-left-top p { margin-bottom: 6px; }
+  .footer-left-bottom { margin-top: 40px; color: var(--footer-text-muted); font-size: 0.9rem; }
+  .social-links { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+  .social-links a { display: flex; align-items: center; gap: 8px; color: var(--footer-text); text-decoration: none; font-weight: 500; }
+  .social-links a:hover { color: var(--blue-accent); }
+  .social-links a img {
+    width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;
+    filter: opacity(0.8) grayscale(100%);
+    transition: filter 0.2s ease;
+  }
+  .social-links a:hover img { filter: opacity(1) grayscale(0%); }
+  .footer-center a { display: block; color: var(--footer-text); text-decoration: underline; margin-bottom: 10px; font-weight: 500; }
+  .footer-center a:hover { color: var(--blue-accent); }
+  .footer-right { text-align: right; }
+  .btn-back-top { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--footer-text); }
+  .footer-copyright { border-top: 1px solid #444444; padding-top: 20px; text-align: center;
+    font-size: 0.85rem; color: var(--footer-text-muted); }
 
   @media (max-width: 760px) {
     .layout { grid-template-columns: 1fr; }
@@ -163,19 +180,36 @@
     </div>
   </main>
 
-  <footer>
+  <footer id="contact">
+    <div class="footer-main">
+      <div>
+        <div class="footer-left-top">
+          <p id="footerEmail">dsccsmu@gmail.com</p>
+          <div class="social-links" id="socialLinks"></div>
+        </div>
+        <div class="footer-left-bottom">
+          <p id="footerAddress">Taichung, Taiwan</p>
+        </div>
+      </div>
+
+      <div class="footer-center">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Accessibility Statement</a>
+        <a href="#">Terms & Conditions</a>
+        <a href="#">Refund Policy</a>
+      </div>
+
+      <div class="footer-right">
+        <button class="btn-back-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">↑</button>
+      </div>
+    </div>
+
     <div class="footer-copyright">&copy; 2026 by CSMU GDGoC</div>
   </footer>
 
+  <script src="footer.js"></script>
+
   <script>
-    /* =========================================================
-       課程資料與分類清單一律來自 site-data.json（由幹部控制台管理）：
-       - courses：欄位對應 title / category / img / description / link
-       - courseCategories：分類清單（字串陣列），side bar 依此陣列動態產生，
-         篩選時直接比對 course.category === 分類字串，不再需要額外的 categoryKey。
-       此檔案本身不內建任何範例資料，初始為空，
-       頁面會依序處理三種狀態：載入中、完全沒有課程、該分類沒有課程。
-       ========================================================= */
     let allCourses = [];
     let categoryList = [];
     let currentCategory = "all";
@@ -224,7 +258,6 @@
       `).join("");
     }
 
-    /* 分類按鈕是動態產生的，改用事件委派（在容器上監聽）而非逐一綁定 */
     categoryNav.addEventListener("click", (e) => {
       const btn = e.target.closest(".category-btn");
       if (!btn) return;
@@ -243,8 +276,6 @@
           categoryList = Array.isArray(data.courseCategories) ? data.courseCategories : [];
         }
       } catch (err) {
-        /* site-data.json 尚未建立、或本機以 file:// 開啟導致 fetch 被瀏覽器擋下時，
-           安靜地維持空狀態畫面即可，不需要打擾使用者。 */
         console.warn("無法載入 site-data.json，目前顯示的是空狀態畫面。", err);
       }
       renderCourses(currentCategory);
