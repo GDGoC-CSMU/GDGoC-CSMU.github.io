@@ -13,7 +13,14 @@
   "footer": {
     "email": "",
     "address": "",
-    "socialLinks": []
+    "socialLinks": [
+      {
+        "id": "s_mt5701kisgeg",
+        "platform": "GitHub",
+        "icon": "assets/images/1787452418730-github.png",
+        "url": "https://github.com/GDGoC-CSMU"
+      }
+    ]
   },
   "courseCategories": [
     "Web Dev",
