@@ -1,1 +1,248 @@
 
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About | GDGoC CSMU</title>
+<style>
+  :root {
+    --bg-light: #f8f9fa;
+    --heading-dark: #211510;
+    --text-gray: #555555;
+    --blue-accent: #0073e6;
+    --border-color: #e0e0e0;
+    --footer-bg: #e8e8e8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; }
+
+  body { background-color: #ffffff; color: var(--heading-dark); line-height: 1.5; }
+
+  /* ===== Header（沿用原本頁首）===== */
+  header {
+    position: sticky; top: 0; z-index: 1000;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 8%; border-bottom: 1px solid var(--border-color);
+    background: #ffffff;
+  }
+  .logo a { font-weight: 700; font-size: 1.15rem; letter-spacing: 0.5px; color: var(--heading-dark); text-decoration: none; }
+  nav { display: flex; gap: 24px; }
+  nav a { text-decoration: none; color: var(--heading-dark); font-size: 0.95rem; font-weight: 500; }
+  nav a:hover, nav a.active { color: var(--blue-accent); }
+
+  /* ===== About Us 簡介區塊（靠左對齊） ===== */
+  .about-intro {
+    padding: 80px 8% 60px;
+    width: 100%;
+  }
+  .about-intro h1 {
+    font-size: 2.6rem; font-weight: 800; margin-bottom: 22px; letter-spacing: -0.5px;
+  }
+  .about-intro p {
+    width: 100%;
+    color: var(--text-gray); font-size: 1rem; line-height: 1.9;
+    text-align: justify; text-align-last: left;
+  }
+  .about-intro p.empty-state {
+    font-style: italic; color: #999;
+  }
+
+  .timeline-empty {
+    text-align: center; color: var(--text-gray); font-style: italic;
+    padding: 40px 20px;
+  }
+
+  /* ===== Timeline 區塊 ===== */
+  .timeline-section { padding: 40px 8% 90px; background-color: var(--bg-light); }
+  .timeline-section h2 {
+    text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 60px;
+  }
+
+  .timeline {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 0;
+    list-style: none;
+  }
+
+  /* 中央貫穿軸線 */
+  .timeline::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: 50%;
+    width: 2px;
+    background: var(--border-color);
+    transform: translateX(-50%);
+  }
+  .timeline.timeline--empty::before { display: none; }
+
+  .timeline-item {
+    position: relative;
+    width: 50%;
+    padding: 0 48px 64px;
+  }
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-item.left  { left: 0;   text-align: right; }
+  .timeline-item.right { left: 50%; text-align: left; }
+
+  /* 節點圓點（::after 畫在軸線上） */
+  .timeline-item::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    width: 14px; height: 14px;
+    background: #fff;
+    border: 3px solid var(--blue-accent);
+    border-radius: 50%;
+    z-index: 2;
+  }
+  .timeline-item.left::after  { right: -8px; }
+  .timeline-item.right::after { left: -8px; }
+
+  .timeline-card {
+    display: inline-block;
+    text-align: left;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    max-width: 380px;
+  }
+  .timeline-year {
+    display: inline-block;
+    font-size: 1.3rem; font-weight: 800; color: var(--blue-accent);
+    margin-bottom: 10px;
+  }
+  .timeline-pic {
+    width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #eee; margin-bottom: 12px;
+  }
+  .timeline-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .timeline-title { font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+  .timeline-desc { color: var(--text-gray); font-size: 0.9rem; line-height: 1.7; }
+
+  /* ===== Footer ===== */
+  footer {
+    background-color: var(--footer-bg); color: var(--heading-dark);
+    padding: 50px 8% 30px; border-top: 1px solid var(--border-color); font-size: 0.95rem;
+  }
+  .footer-copyright { border-top: 1px solid #d0d0d0; padding-top: 20px; text-align: center;
+    font-size: 0.85rem; color: var(--text-gray); margin-top: 40px; }
+
+  /* ===== RWD：手機時間軸改為單側排列 ===== */
+  @media (max-width: 760px) {
+    .about-intro h1 { font-size: 2rem; }
+
+    .timeline::before { left: 20px; }
+
+    .timeline-item,
+    .timeline-item.left,
+    .timeline-item.right {
+      width: 100%;
+      left: 0;
+      text-align: left;
+      padding: 0 20px 48px 52px;
+    }
+    .timeline-item.left::after,
+    .timeline-item.right::after {
+      left: 13px; right: auto;
+    }
+    .timeline-card { max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="logo"><a href="index.html">AI與開源資訊社(´・ω・`)</a></div>
+    <nav>
+      <a href="about.html" class="active">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="activities.html">Activities</a>
+    </nav>
+  </header>
+
+  <section class="about-intro">
+    <h1>About Us</h1>
+    <p id="aboutIntroText" class="empty-state">尚未填寫社團簡介，請於幹部控制台編輯後發布。</p>
+  </section>
+
+  <section class="timeline-section">
+    <h2>社團發展歷程</h2>
+    <ol class="timeline" id="timelineList"></ol>
+  </section>
+
+  <footer id="contact">
+    <div class="footer-copyright">&copy; 2026 by CSMU GDGoC</div>
+  </footer>
+
+  <script>
+    const FALLBACK_TIMELINE = [];
+
+    function parseDateKey(dateStr) {
+      const parts = String(dateStr || "").split(".").map(n => parseInt(n, 10) || 0);
+      const [y = 0, m = 0, d = 0] = parts;
+      return y * 10000 + m * 100 + d;
+    }
+    
+    function renderTimeline(data) {
+      const list = document.getElementById("timelineList");
+
+      if (!Array.isArray(data) || data.length === 0) {
+        list.classList.add("timeline--empty");
+        list.innerHTML = `<li class="timeline-empty">目前尚無歷程資料，敬請期待社團故事上線。</li>`;
+        return;
+      }
+      list.classList.remove("timeline--empty");
+
+      const sorted = [...data].sort((a, b) => parseDateKey(b.date) - parseDateKey(a.date));
+
+      list.innerHTML = sorted.map((item, index) => {
+        const side = index % 2 === 0 ? "left" : "right";
+        const picHtml = item.imageUrl
+          ? `<div class="timeline-pic"><img src="${item.imageUrl}" alt="${item.title}"></div>`
+          : "";
+
+        return `
+          <li class="timeline-item ${side}">
+            <div class="timeline-card">
+              <span class="timeline-year">${item.date}</span>
+              ${picHtml}
+              <div class="timeline-title">${item.title}</div>
+              <p class="timeline-desc">${item.description}</p>
+            </div>
+          </li>
+        `;
+      }).join("");
+    }
+
+    /* 先用備援資料（目前為空陣列）立即渲染，避免使用者等待時看到未初始化的畫面 */
+    renderTimeline(FALLBACK_TIMELINE);
+
+    /* 再非同步嘗試載入幹部控制台發布的最新內容，成功則覆蓋畫面 */
+    async function loadLiveSiteData() {
+      try {
+        const res = await fetch("site-data.json", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const introEl = document.getElementById("aboutIntroText");
+        if (data.about && data.about.intro) {
+          introEl.textContent = data.about.intro;
+          introEl.classList.remove("empty-state");
+        } else {
+          introEl.textContent = "尚未填寫社團簡介，請於幹部控制台編輯後發布。";
+          introEl.classList.add("empty-state");
+        }
+
+        renderTimeline(Array.isArray(data.timeline) ? data.timeline : []);
+      } catch (err) {
+        console.warn("無法載入 site-data.json，目前顯示的是頁面內建的空狀態畫面。", err);
+      }
+    }
+    loadLiveSiteData();
+  </script>
+</body>
+</html>
