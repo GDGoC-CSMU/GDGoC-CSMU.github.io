@@ -1,1 +1,256 @@
 
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>課程 | GDGoC CSMU</title>
+<style>
+  :root {
+    --bg-light: #f8f9fa;
+    --heading-dark: #211510;
+    --text-gray: #555555;
+    --blue-accent: #0073e6;
+    --border-color: #e0e0e0;
+    --footer-bg: #e8e8e8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; }
+
+  body { background-color: #ffffff; color: var(--heading-dark); line-height: 1.5; }
+
+  /* ===== Header（沿用原本頁首）===== */
+  header {
+    position: sticky; top: 0; z-index: 1000;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 8%; border-bottom: 1px solid var(--border-color);
+    background: #ffffff;
+  }
+  .logo a { font-weight: 700; font-size: 1.15rem; letter-spacing: 0.5px; color: var(--heading-dark); text-decoration: none; }
+  nav { display: flex; gap: 24px; }
+  nav a { text-decoration: none; color: var(--heading-dark); font-size: 0.95rem; font-weight: 500; }
+  nav a:hover, nav a.active { color: var(--blue-accent); }
+
+  /* ===== 主要內容：側欄 + 卡片網格 ===== */
+  main { padding: 50px 8% 80px; }
+  main h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+  main > .page-desc { color: var(--text-gray); margin-bottom: 40px; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  /* 分類選單 */
+  .sidebar { position: sticky; top: 100px; }
+  .sidebar h2 { font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-gray); margin-bottom: 16px; }
+  .category-list { display: flex; flex-direction: column; gap: 8px; }
+  .category-btn {
+    text-align: left; padding: 10px 14px; border: 1px solid var(--border-color);
+    background: #fff; cursor: pointer; font-size: 0.92rem; color: var(--heading-dark);
+    transition: border-color .2s ease, color .2s ease, background-color .2s ease;
+  }
+  .category-btn:hover { border-color: var(--blue-accent); color: var(--blue-accent); }
+  .category-btn.active { background: var(--heading-dark); border-color: var(--heading-dark); color: #fff; }
+
+  /* 卡片網格 */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 24px;
+  }
+
+  .course-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .course-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(0,0,0,0.14);
+  }
+  .course-card .card-pic { width: 100%; aspect-ratio: 4 / 3; overflow: hidden; background: #eee; }
+  .course-card .card-pic img { width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform .5s ease; }
+  .course-card:hover .card-pic img { transform: scale(1.06); }
+  .course-card .card-body { padding: 14px 16px 18px; }
+  .course-card .card-tag { display: inline-block; font-size: 0.72rem; color: var(--blue-accent);
+    text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .course-card .card-name { font-weight: 700; font-size: 1rem; }
+
+  /* ===== 懸停：卡片內浮出簡介與相關連結 ===== */
+  .course-info-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 18px 16px;
+    background: linear-gradient(180deg, rgba(15,10,8,0.05) 0%, rgba(15,10,8,0.94) 60%);
+    color: #fff;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity .3s ease, transform .3s ease;
+    pointer-events: none;
+  }
+  .course-card:hover .course-info-overlay {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .course-info-overlay .overlay-tag {
+    display: inline-block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: .5px;
+    color: #9fc9ff; margin-bottom: 8px;
+  }
+  .course-info-overlay h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+  .course-info-overlay p { font-size: 0.82rem; line-height: 1.6; opacity: 0.9; margin-bottom: 14px; }
+  .course-info-overlay .overlay-link {
+    align-self: flex-start; font-size: 0.8rem; font-weight: 600; color: #fff;
+    text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.6); padding-bottom: 2px;
+    transition: border-color .2s ease;
+  }
+  .course-info-overlay .overlay-link:hover { border-color: #fff; }
+
+  /* ===== 空狀態（尚無資料 / 該分類尚無卡片） ===== */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-gray);
+    font-size: 0.95rem;
+    padding: 70px 20px;
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    background-color: var(--footer-bg); color: var(--heading-dark);
+    padding: 50px 8% 30px; border-top: 1px solid var(--border-color); font-size: 0.95rem;
+  }
+  .footer-copyright { border-top: 1px solid #d0d0d0; padding-top: 20px; text-align: center;
+    font-size: 0.85rem; color: var(--text-gray); margin-top: 40px; }
+
+  @media (max-width: 760px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .category-list { flex-direction: row; flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="logo"><a href="index.html">AI與開源資訊社(´・ω・`)</a></div>
+    <nav>
+      <a href="about.html">About</a>
+      <a href="courses.html" class="active">Courses</a>
+      <a href="activities.html">Activities</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>社課課程</h1>
+    <p class="page-desc">從零基礎到實作導向，依分類挑選你感興趣的課程主題。</p>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>課程分類</h2>
+        <div class="category-list" id="categoryList"></div>
+      </aside>
+
+      <section class="card-grid" id="cardGrid"></section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-copyright">&copy; 2026 by CSMU GDGoC</div>
+  </footer>
+
+  <script>
+    /* =========================================================
+       課程資料與分類清單一律來自 site-data.json（由幹部控制台管理）：
+       - courses：欄位對應 title / category / img / description / link
+       - courseCategories：分類清單（字串陣列），side bar 依此陣列動態產生，
+         篩選時直接比對 course.category === 分類字串，不再需要額外的 categoryKey。
+       此檔案本身不內建任何範例資料，初始為空，
+       頁面會依序處理三種狀態：載入中、完全沒有課程、該分類沒有課程。
+       ========================================================= */
+    let allCourses = [];
+    let categoryList = [];
+    let currentCategory = "all";
+
+    const grid = document.getElementById("cardGrid");
+    const categoryNav = document.getElementById("categoryList");
+
+    function renderCategoryButtons() {
+      const buttons = [`<button class="category-btn ${currentCategory === "all" ? "active" : ""}" data-category="all">全部課程</button>`]
+        .concat(categoryList.map(cat => `
+          <button class="category-btn ${currentCategory === cat ? "active" : ""}" data-category="${cat}">${cat}</button>
+        `));
+      categoryNav.innerHTML = buttons.join("");
+    }
+
+    function renderCourses(filter) {
+      currentCategory = filter;
+      renderCategoryButtons();
+
+      if (allCourses.length === 0) {
+        grid.innerHTML = `<p class="empty-state">目前尚無課程資料，敬請期待新課程上線！</p>`;
+        return;
+      }
+
+      const filtered = allCourses.filter(c => filter === "all" || c.category === filter);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p class="empty-state">此分類目前尚無課程。</p>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(c => `
+        <article class="course-card">
+          <div class="card-pic">${c.img ? `<img src="${c.img}" alt="${c.title || ""}">` : ""}</div>
+          <div class="card-body">
+            <span class="card-tag">${c.category || ""}</span>
+            <div class="card-name">${c.title || "（未命名課程）"}</div>
+          </div>
+          <div class="course-info-overlay">
+            <span class="overlay-tag">${c.category || ""}</span>
+            <h3>${c.title || "（未命名課程）"}</h3>
+            <p>${c.description || ""}</p>
+            ${c.link ? `<a class="overlay-link" href="${c.link}" target="_blank" rel="noopener noreferrer">查看課程資源 →</a>` : ""}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    /* 分類按鈕是動態產生的，改用事件委派（在容器上監聽）而非逐一綁定 */
+    categoryNav.addEventListener("click", (e) => {
+      const btn = e.target.closest(".category-btn");
+      if (!btn) return;
+      renderCourses(btn.dataset.category);
+    });
+
+    /* 先顯示空狀態，避免 fetch 完成前出現未初始化的空白畫面 */
+    renderCourses("all");
+
+    async function loadCourses() {
+      try {
+        const res = await fetch("site-data.json", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          allCourses = Array.isArray(data.courses) ? data.courses : [];
+          categoryList = Array.isArray(data.courseCategories) ? data.courseCategories : [];
+        }
+      } catch (err) {
+        /* site-data.json 尚未建立、或本機以 file:// 開啟導致 fetch 被瀏覽器擋下時，
+           安靜地維持空狀態畫面即可，不需要打擾使用者。 */
+        console.warn("無法載入 site-data.json，目前顯示的是空狀態畫面。", err);
+      }
+      renderCourses(currentCategory);
+    }
+    loadCourses();
+  </script>
+</body>
+</html>
