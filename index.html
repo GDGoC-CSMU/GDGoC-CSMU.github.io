@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -5,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GDGoC CSMU</title>
   <style>
-    /* 全局變數 */
     :root {
       --bg-light: #f8f9fa;
       --heading-dark: #211510;
@@ -15,14 +15,12 @@
       --footer-bg: #e8e8e8;
     }
 
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; 
-      box-shadow: none !important; /* 強制全站無陰影 */
+    * {
+      box-sizing: border-box; margin: 0; padding: 0;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+      box-shadow: none !important;
     }
-    
+
     body { background-color: #ffffff; color: var(--heading-dark); line-height: 1.5; }
 
     /* Header 導覽列 */
@@ -33,80 +31,28 @@
       background: #ffffff;
     }
     .logo a { font-weight: 700; font-size: 1.15rem; letter-spacing: 0.5px; color: var(--heading-dark); text-decoration: none; }
-    
     nav { display: flex; gap: 24px; }
     nav a { text-decoration: none; color: var(--heading-dark); font-size: 0.95rem; font-weight: 500; }
     nav a:hover, nav a.active { color: var(--blue-accent); }
 
-    .header-right { display: flex; align-items: center; gap: 20px; font-size: 0.95rem; }
-    .btn-quote {
-      padding: 8px 18px; border: 1.5px solid var(--heading-dark);
-      background: transparent; font-weight: 600; cursor: pointer; color: var(--heading-dark);
-    }
-
     /* Hero 主視覺區塊 */
-    .hero { 
-      display: grid; 
-      grid-template-columns: 1fr 1fr; 
-      gap: 20px; 
-      padding: 50px 8%; 
-      align-items: start; 
-    }
-    
-    .hero-left h1 { 
-      font-size: 3.2rem; 
-      line-height: 1.08; 
-      font-weight: 800; 
-      margin-bottom: 20px; 
-      color: var(--heading-dark); 
-      letter-spacing: -0.5px;
-    }
-    
-    .hero-left .subtitle { 
-      color: var(--text-gray); 
-      font-size: 1rem; 
-      font-weight: 500; 
-      margin-bottom: 30px; 
-    }
-    
+    .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 50px 8%; align-items: start; }
+    .hero-left h1 { font-size: 3.2rem; line-height: 1.08; font-weight: 800; margin-bottom: 20px;
+      color: var(--heading-dark); letter-spacing: -0.5px; white-space: pre-line; }
+    .hero-left .subtitle { color: var(--text-gray); font-size: 1rem; font-weight: 500; margin-bottom: 30px; }
     .btn-contact {
-      padding: 10px 32px; 
-      background-color: var(--blue-accent); 
-      color: white;
-      border: none; 
-      border-radius: 0px;
-      font-size: 0.95rem; 
-      font-weight: 600;
-      cursor: pointer; 
-      text-decoration: none; 
-      display: inline-block;
+      padding: 10px 32px; background-color: var(--blue-accent); color: white; border: none; border-radius: 0px;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block;
     }
 
-    /* 點點矩陣背景與靜態散落照片 */
+    /* 點點矩陣背景與散落照片（照片來自 site-data.json，無資料時只顯示點狀背景，不留破圖） */
     .scatter-grid {
-      position: relative;
-      width: 100%;
-      height: 420px;
+      position: relative; width: 100%; height: 420px;
       background-image: radial-gradient(#aaa 1.5px, transparent 1.5px);
-      background-size: 40px 40px;
-      background-position: 0 0;
+      background-size: 40px 40px; background-position: 0 0;
     }
-
-    .photo-card {
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      overflow: hidden;
-      border: none;
-    }
-
-    .photo-card img { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
-      display: block;
-    }
-
+    .photo-card { position: absolute; width: 80px; height: 80px; overflow: hidden; border: none; }
+    .photo-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .photo-1 { top: 40px;  left: 120px; }
     .photo-2 { top: 120px; left: 360px; }
     .photo-3 { top: 240px; left: 0px;   }
@@ -118,16 +64,20 @@
     .card-container { display: flex; background-color: #0c1829; color: white; min-height: 300px; }
     .card-img { width: 45%; object-fit: cover; }
     .card-content { width: 55%; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
-    
     .slider-btn {
       position: absolute; top: 50%; transform: translateY(-50%);
       width: 40px; height: 80px; border: 1px solid var(--border-color); font-size: 1.2rem;
       cursor: pointer; background: #ffffff; color: #333333; z-index: 10;
     }
+    .slider-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .slider-btn-left { left: -20px; }
     .slider-btn-right { right: -20px; }
+    .card-container.empty-state {
+      align-items: center; justify-content: center; text-align: center; padding: 40px;
+    }
+    .card-container.empty-state p { color: rgba(255,255,255,0.75); font-size: 0.95rem; }
 
-    /* 保留：社團日曆區塊 */
+    /* 社團日曆區塊 */
     .calendar-container {
       max-width: 900px; margin: 30px auto 0; background: #fff;
       overflow: hidden; border: 1px solid var(--border-color);
@@ -147,6 +97,9 @@
     .footer-main { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 40px; align-items: start; margin-bottom: 50px; }
     .footer-left-top p { margin-bottom: 6px; }
     .footer-left-bottom { margin-top: 40px; color: var(--text-gray); font-size: 0.9rem; }
+    .social-links { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+    .social-links a { display: flex; align-items: center; gap: 6px; color: var(--heading-dark); text-decoration: none; font-weight: 500; }
+    .social-links a:hover { color: var(--blue-accent); }
     .footer-center a { display: block; color: var(--heading-dark); text-decoration: underline; margin-bottom: 10px; font-weight: 500; }
     .footer-right { text-align: right; }
     .btn-back-top { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--heading-dark); }
@@ -155,7 +108,6 @@
 </head>
 <body>
 
-  <!-- Header 導覽列 -->
   <header>
     <div class="logo"><a href="index.html">AI與開源資訊社(´・ω・`)</a></div>
     <nav>
@@ -165,59 +117,46 @@
     </nav>
   </header>
 
-  <!-- Hero 主視覺區塊 -->
   <section class="hero">
     <div class="hero-left">
-      <h1>Developer<br>Student Clubs<br>on CSMU</h1>
-      <div class="subtitle">中山醫學大學 AI與開源資訊社</div>
+      <h1 id="heroTitle">Developer Student Clubs
+on CSMU</h1>
+      <div class="subtitle" id="heroSubtitle">中山醫學大學 AI與開源資訊社</div>
       <a href="#contact" class="btn-contact">Contact Us</a>
     </div>
-  
-    <div class="scatter-grid">
-      <div class="photo-card photo-1"><img src="https://picsum.photos/id/1018/200/200" alt="照片1"></div>
-      <div class="photo-card photo-2"><img src="https://picsum.photos/id/1015/200/200" alt="照片2"></div>
-      <div class="photo-card photo-3"><img src="https://picsum.photos/id/1019/200/200" alt="照片3"></div>
-      <div class="photo-card photo-4"><img src="https://picsum.photos/id/1025/200/200" alt="照片4"></div>
-    </div>
+
+    <div class="scatter-grid" id="scatterGrid"></div>
   </section>
 
-  <!-- 社團特色輪播 -->
   <section class="section-padding">
     <h2 style="font-size: 1.8rem; margin-bottom: 30px; color: var(--heading-dark);">關於我們的社團特色</h2>
     <div class="slider-wrapper">
-      <button class="slider-btn slider-btn-left" onclick="prevCard()">&lt;</button>
+      <button class="slider-btn slider-btn-left" id="prevBtn" onclick="prevCard()">&lt;</button>
       <div class="card-container" id="cardContainer"></div>
-      <button class="slider-btn slider-btn-right" onclick="nextCard()">&gt;</button>
+      <button class="slider-btn slider-btn-right" id="nextBtn" onclick="nextCard()">&gt;</button>
     </div>
   </section>
 
-  <!-- 保留：社團日曆區塊 -->
   <section class="section-padding" style="background-color: var(--bg-light); text-align: center;">
     <h2 style="font-size: 1.8rem; margin-bottom: 10px; color: var(--heading-dark);">社團行事曆 & 活動時間</h2>
     <p style="color: var(--text-gray);">歡迎查閱最新的社課、工作坊與活動安排</p>
-    
+
     <div class="calendar-container">
       <iframe class="calendar-iframe" src="https://calendar.google.com/calendar/embed?src=dsccsmu%40gmail.com&ctz=Asia%2FTaipei"></iframe>
     </div>
-    
+
     <a href="https://calendar.google.com/calendar/u/0/r?cid=dsccsmu@gmail.com" target="_blank" class="btn-google-cal">在 Google Calendar 中開啟</a>
   </section>
 
-<footer id="contact">
+  <footer id="contact">
     <div class="footer-main">
       <div>
         <div class="footer-left-top">
-          <p>dsccsmu@gmail.com</p>
-          
-          <!-- 新增：社群連結區塊 -->
-          <div class="social-links">
-            <a href="https://hackmd.io/@dsc-csmu" target="_blank" rel="noopener noreferrer">HackMD</a>
-            <a href="https://github.com/GDGoC-CSMU" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <a href="https://discord.gg/Fg7AudkwuC" target="_blank" rel="noopener noreferrer">Discord</a>
-          </div>
+          <p id="footerEmail">dsccsmu@gmail.com</p>
+          <div class="social-links" id="socialLinks"></div>
         </div>
         <div class="footer-left-bottom">
-          <p>Taichung, Taiwan</p>
+          <p id="footerAddress">Taichung, Taiwan</p>
         </div>
       </div>
 
@@ -233,30 +172,115 @@
       </div>
     </div>
 
-    <div class="footer-copyright">
-      &copy; 2026 by CSMU GDGoC
-    </div>
+    <div class="footer-copyright">&copy; 2026 by CSMU GDGoC</div>
   </footer>
 
   <script>
-    const clubCards = [
-      { img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600", title: "跨領域學習與技術交流", desc: "不論來自什麼科系，都能從零基礎踏入程式開發與AI領域。" },
-      { img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600", title: "實作導向工作坊", desc: "社課規劃以實作為導向，期望協助社員累積資料。" },
-      { img: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600", title: "開源社群資源共享", desc: "連結開源社群資源，不定期辦理企業參訪。" }
-    ];
+    /* =========================================================
+       首頁的三個動態區塊全部來自 site-data.json，一律不內建任何範例圖片／文字：
+       - home.banner.images   → Hero 右側散落照片，留空則只顯示點狀背景
+       - home.flashCards      → 「關於我們的社團特色」輪播卡片，留空則顯示提示文字
+       - footer.socialLinks   → 頁尾社群連結，留空則不渲染該區塊
+       - home.banner.title / subtitle、footer.email / address 若為空字串，
+         則維持頁面原本寫死的預設文字（品牌名稱與聯絡資訊），不強制清空成空白畫面。
+       ========================================================= */
+
+    let flashCards = [];
     let currentIndex = 0;
+
+    function renderScatterGrid(images) {
+      const grid = document.getElementById("scatterGrid");
+      if (!Array.isArray(images) || images.length === 0) {
+        grid.innerHTML = ""; /* 只留下 CSS 畫出的點狀背景，不放任何照片 */
+        return;
+      }
+      const positions = ["photo-1", "photo-2", "photo-3", "photo-4"];
+      grid.innerHTML = images.slice(0, 4).map((img, i) => `
+        <div class="photo-card ${positions[i] || ""}">
+          <img src="${img.url}" alt="社團照片">
+        </div>
+      `).join("");
+    }
+
     function renderCard() {
-      const card = clubCards[currentIndex];
-      document.getElementById("cardContainer").innerHTML = `
-        <img class="card-img" src="${card.img}">
-        <div class="card-content">
-          <h3 style="margin-bottom:12px;">${card.title}</h3>
-          <p style="opacity:0.85; line-height:1.6; font-size:0.95rem;">${card.desc}</p>
+      const container = document.getElementById("cardContainer");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+
+      if (flashCards.length === 0) {
+        container.classList.add("empty-state");
+        container.innerHTML = `<p>目前尚無社團特色卡片，敬請期待內容上線！</p>`;
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        return;
+      }
+      container.classList.remove("empty-state");
+      prevBtn.disabled = false;
+      nextBtn.disabled = false;
+
+      const card = flashCards[currentIndex];
+      container.innerHTML = `
+        ${card.img ? `<img class="card-img" src="${card.img}">` : ""}
+        <div class="card-content" style="${card.img ? "" : "width:100%;"}">
+          <h3 style="margin-bottom:12px;">${card.title || "（未命名）"}</h3>
+          <p style="opacity:0.85; line-height:1.6; font-size:0.95rem;">${card.desc || ""}</p>
         </div>`;
     }
-    function nextCard() { currentIndex = (currentIndex + 1) % clubCards.length; renderCard(); }
-    function prevCard() { currentIndex = (currentIndex - 1 + clubCards.length) % clubCards.length; renderCard(); }
-    renderCard();
+    function nextCard() {
+      if (flashCards.length === 0) return;
+      currentIndex = (currentIndex + 1) % flashCards.length;
+      renderCard();
+    }
+    function prevCard() {
+      if (flashCards.length === 0) return;
+      currentIndex = (currentIndex - 1 + flashCards.length) % flashCards.length;
+      renderCard();
+    }
+    renderCard(); /* 先渲染空狀態，避免 fetch 完成前出現未初始化畫面 */
+
+    function renderSocialLinks(links) {
+      const wrap = document.getElementById("socialLinks");
+      if (!Array.isArray(links) || links.length === 0) {
+        wrap.innerHTML = "";
+        wrap.style.display = "none";
+        return;
+      }
+      wrap.style.display = "";
+      wrap.innerHTML = links.map(link => `
+        <a href="${link.url}" target="_blank" rel="noopener noreferrer">
+          <span>${link.icon || "🔗"}</span><span>${link.platform || ""}</span>
+        </a>
+      `).join("");
+    }
+
+    async function loadSiteContent() {
+      try {
+        const res = await fetch("site-data.json", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data.home && data.home.banner) {
+          if (data.home.banner.title) document.getElementById("heroTitle").textContent = data.home.banner.title;
+          if (data.home.banner.subtitle) document.getElementById("heroSubtitle").textContent = data.home.banner.subtitle;
+          renderScatterGrid(data.home.banner.images);
+        }
+
+        if (data.home && Array.isArray(data.home.flashCards)) {
+          flashCards = data.home.flashCards;
+          currentIndex = 0;
+          renderCard();
+        }
+
+        if (data.footer) {
+          if (data.footer.email) document.getElementById("footerEmail").textContent = data.footer.email;
+          if (data.footer.address) document.getElementById("footerAddress").textContent = data.footer.address;
+          renderSocialLinks(data.footer.socialLinks);
+        }
+      } catch (err) {
+        console.warn("無法載入 site-data.json，目前顯示的是頁面內建的預設內容。", err);
+      }
+    }
+    loadSiteContent();
   </script>
 </body>
 </html>
