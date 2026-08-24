@@ -135,20 +135,26 @@
     background-color: var(--footer-bg); color: var(--footer-text);
     padding: 50px 8% 30px; border-top: 1px solid var(--footer-border); font-size: 0.95rem;
   }
-  .footer-main { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 40px; align-items: start; margin-bottom: 50px; }
-  .footer-left-top p { margin-bottom: 6px; }
-  .footer-left-bottom { margin-top: 40px; color: var(--footer-text-muted); font-size: 0.9rem; }
-  .social-links { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
-  .social-links a { display: flex; align-items: center; gap: 8px; color: var(--footer-text); text-decoration: none; font-weight: 500; }
-  .social-links a:hover { color: var(--blue-accent); }
-  .social-links a img {
-    width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;
+  .footer-main { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 40px; align-items: center; margin-bottom: 50px; }
+  .footer-left p { margin-bottom: 6px; }
+  .footer-left .footer-address { color: var(--footer-text-muted); font-size: 0.9rem; margin-top: 10px; }
+
+  /* 社群圖示容器（取代原本的 Privacy Policy 等法律連結位置） */
+  .footer-center { display: flex; }
+  .social-links { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .social-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+  .social-link img {
+    width: 24px; height: 24px; object-fit: contain;
     filter: opacity(0.8) grayscale(100%);
     transition: filter 0.2s ease;
   }
-  .social-links a:hover img { filter: opacity(1) grayscale(0%); }
-  .footer-center a { display: block; color: var(--footer-text); text-decoration: underline; margin-bottom: 10px; font-weight: 500; }
-  .footer-center a:hover { color: var(--blue-accent); }
+  .social-link:hover img { filter: opacity(1) grayscale(0%); }
+  /* 圖片載入失敗時（路徑錯誤、檔案被刪除）JS 會加上這個 class 並改顯示文字，避免破圖 */
+  .social-link.icon-fallback span {
+    color: var(--footer-text); font-size: 0.85rem; font-weight: 600;
+  }
+  .social-link.icon-fallback:hover span { color: var(--blue-accent); }
+
   .footer-right { text-align: right; }
   .btn-back-top { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--footer-text); }
   .footer-copyright { border-top: 1px solid #444444; padding-top: 20px; text-align: center;
@@ -174,10 +180,11 @@
 
   <main>
     <h1>社團活動</h1>
-    <p class="page-desc">b</p>
+    <p class="page-desc">從社課到黑客松，點擊卡片查看活動詳情。</p>
 
     <div class="layout">
       <aside class="sidebar">
+        <h2>活動類型</h2>
         <div class="category-list" id="categoryList"></div>
       </aside>
 
@@ -187,21 +194,13 @@
 
   <footer id="contact">
     <div class="footer-main">
-      <div>
-        <div class="footer-left-top">
-          <p id="footerEmail">dsccsmu@gmail.com</p>
-          <div class="social-links" id="socialLinks"></div>
-        </div>
-        <div class="footer-left-bottom">
-          <p id="footerAddress">Taichung, Taiwan</p>
-        </div>
+      <div class="footer-left">
+        <p id="footerEmail">dsccsmu@gmail.com</p>
+        <p id="footerAddress" class="footer-address">Taichung, Taiwan</p>
       </div>
 
       <div class="footer-center">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Accessibility Statement</a>
-        <a href="#">Terms & Conditions</a>
-        <a href="#">Refund Policy</a>
+        <div id="social-links-container" class="social-links"></div>
       </div>
 
       <div class="footer-right">
