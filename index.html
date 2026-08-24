@@ -102,19 +102,19 @@
 
     /* 社群圖示容器（取代原本的 Privacy Policy 等法律連結位置） */
     .footer-center { display: flex; }
-    .social-links { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-    .social-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-    .social-link img {
+    .social-links-row { display: flex; gap: 16px; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .social-links-row a { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+    .social-links-row img {
       width: 24px; height: 24px; object-fit: contain;
-      filter: opacity(0.8) grayscale(100%);
-      transition: filter 0.2s ease;
+      filter: brightness(0.8) grayscale(100%);
+      transition: all 0.2s;
     }
-    .social-link:hover img { filter: opacity(1) grayscale(0%); }
+    .social-links-row a:hover img { filter: brightness(1.15) grayscale(0%); }
     /* 圖片載入失敗時（路徑錯誤、檔案被刪除）JS 會加上這個 class 並改顯示文字，避免破圖 */
-    .social-link.icon-fallback span {
+    .social-links-row a.icon-fallback span {
       color: var(--footer-text); font-size: 0.85rem; font-weight: 600;
     }
-    .social-link.icon-fallback:hover span { color: var(--blue-accent); }
+    .social-links-row a.icon-fallback:hover span { color: var(--blue-accent); }
 
     .footer-right { text-align: right; }
     .btn-back-top { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--footer-text); }
@@ -153,7 +153,6 @@ on CSMU</h1>
   </section>
 
   <section class="section-padding" style="background-color: var(--bg-light); text-align: center;">
-    <h2 style="font-size: 1.8rem; margin-bottom: 10px; color: var(--heading-dark);">社團行事曆 & 活動時間</h2>
     <p style="color: var(--text-gray);">歡迎查閱最新的社課、工作坊與活動安排</p>
 
     <div class="calendar-container">
@@ -171,7 +170,7 @@ on CSMU</h1>
       </div>
 
       <div class="footer-center">
-        <div id="social-links-container" class="social-links"></div>
+        <div id="social-links-container" class="social-links-row"></div>
       </div>
 
       <div class="footer-right">
@@ -189,7 +188,7 @@ on CSMU</h1>
     function renderScatterGrid(images) {
       const grid = document.getElementById("scatterGrid");
       if (!Array.isArray(images) || images.length === 0) {
-        grid.innerHTML = "";
+        grid.innerHTML = ""; /* 只留下 CSS 畫出的點狀背景，不放任何照片 */
         return;
       }
       const positions = ["photo-1", "photo-2", "photo-3", "photo-4"];
@@ -234,7 +233,7 @@ on CSMU</h1>
       currentIndex = (currentIndex - 1 + flashCards.length) % flashCards.length;
       renderCard();
     }
-    renderCard();
+    renderCard(); /* 先渲染空狀態，避免 fetch 完成前出現未初始化畫面 */
 
     async function loadSiteContent() {
       try {
@@ -259,6 +258,6 @@ on CSMU</h1>
     }
     loadSiteContent();
   </script>
-  <script src="footer.js"></script>
+  <script src="footer.js?v=3"></script>
 </body>
 </html>
