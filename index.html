@@ -188,7 +188,7 @@ on CSMU</h1>
     function renderScatterGrid(images) {
       const grid = document.getElementById("scatterGrid");
       if (!Array.isArray(images) || images.length === 0) {
-        grid.innerHTML = ""; /* 只留下 CSS 畫出的點狀背景，不放任何照片 */
+        grid.innerHTML = "";
         return;
       }
       const positions = ["photo-1", "photo-2", "photo-3", "photo-4"];
@@ -233,7 +233,7 @@ on CSMU</h1>
       currentIndex = (currentIndex - 1 + flashCards.length) % flashCards.length;
       renderCard();
     }
-    renderCard(); /* 先渲染空狀態，避免 fetch 完成前出現未初始化畫面 */
+    renderCard();
 
     async function loadSiteContent() {
       try {
