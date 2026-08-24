@@ -25,6 +25,12 @@
         "platform": "IG",
         "icon": "assets/images/1787562124960-_______2026-08-24_170155.png",
         "url": "https://www.instagram.com/dsc_csmu/"
+      },
+      {
+        "id": "s_mt71fi2oqvps",
+        "platform": "HackMD",
+        "icon": "",
+        "url": "https://hackmd.io/@dsc-csmu"
       }
     ]
   },
