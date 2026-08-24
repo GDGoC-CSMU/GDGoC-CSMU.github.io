@@ -138,18 +138,17 @@
   /* 社群圖示容器（取代原本的 Privacy Policy 等法律連結位置） */
   .footer-center { display: flex; }
   .social-links-row { display: flex; gap: 16px; align-items: center; justify-content: center; flex-wrap: wrap; }
-  .social-links-row a { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-  .social-links-row img {
+  .social-link-item {
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--footer-text); text-decoration: none; font-size: 0.85rem; font-weight: 600;
+  }
+  .social-link-item:hover { color: var(--blue-accent); }
+  .social-link-item img {
     width: 24px; height: 24px; object-fit: contain;
     filter: brightness(0.8) grayscale(100%);
     transition: all 0.2s;
   }
-  .social-links-row a:hover img { filter: brightness(1.15) grayscale(0%); }
-  /* 圖片載入失敗時（路徑錯誤、檔案被刪除）JS 會加上這個 class 並改顯示文字，避免破圖 */
-  .social-links-row a.icon-fallback span {
-    color: var(--footer-text); font-size: 0.85rem; font-weight: 600;
-  }
-  .social-links-row a.icon-fallback:hover span { color: var(--blue-accent); }
+  .social-link-item:hover img { filter: brightness(1.15) grayscale(0%); }
 
   .footer-right { text-align: right; }
   .btn-back-top { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--footer-text); }
@@ -217,7 +216,7 @@
     <div class="footer-copyright">&copy; 2026 by CSMU GDGoC</div>
   </footer>
 
-  <script src="footer.js?v=3"></script>
+  <script src="footer.js?v=4"></script>
 
   <script>
     const FALLBACK_TIMELINE = [];
@@ -257,7 +256,6 @@
         `;
       }).join("");
     }
-
     renderTimeline(FALLBACK_TIMELINE);
 
     async function loadLiveSiteData() {
