@@ -138,17 +138,17 @@
   /* 社群圖示容器（取代原本的 Privacy Policy 等法律連結位置） */
   .footer-center { display: flex; }
   .social-links-row { display: flex; gap: 16px; align-items: center; justify-content: center; flex-wrap: wrap; }
-  .social-links-row a { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-  .social-links-row img {
+  .social-link-item {
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--footer-text); text-decoration: none; font-size: 0.85rem; font-weight: 600;
+  }
+  .social-link-item:hover { color: var(--blue-accent); }
+  .social-link-item img {
     width: 24px; height: 24px; object-fit: contain;
     filter: brightness(0.8) grayscale(100%);
     transition: all 0.2s;
   }
-  .social-links-row a:hover img { filter: brightness(1.15) grayscale(0%); }
-  .social-links-row a.icon-fallback span {
-    color: var(--footer-text); font-size: 0.85rem; font-weight: 600;
-  }
-  .social-links-row a.icon-fallback:hover span { color: var(--blue-accent); }
+  .social-link-item:hover img { filter: brightness(1.15) grayscale(0%); }
 
   .footer-right { text-align: right; }
   .btn-back-top { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--footer-text); }
@@ -175,7 +175,7 @@
 
   <main>
     <h1>社課課程</h1>
-    <p class="page-desc">探索歷年的社課與教學。</p>
+    <p class="page-desc">探索歷年的社課及教學主題。</p>
 
     <div class="layout">
       <aside class="sidebar">
@@ -205,7 +205,7 @@
     <div class="footer-copyright">&copy; 2026 by CSMU GDGoC</div>
   </footer>
 
-  <script src="footer.js?v=3"></script>
+  <script src="footer.js?v=4"></script>
 
   <script>
     let allCourses = [];
@@ -255,14 +255,12 @@
         </article>
       `).join("");
     }
-
     categoryNav.addEventListener("click", (e) => {
       const btn = e.target.closest(".category-btn");
       if (!btn) return;
       renderCourses(btn.dataset.category);
     });
 
-    /* 先顯示空狀態，避免 fetch 完成前出現未初始化的空白畫面 */
     renderCourses("all");
 
     async function loadCourses() {
