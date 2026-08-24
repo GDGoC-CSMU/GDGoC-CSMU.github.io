@@ -47,7 +47,6 @@
       font-size: 0.95rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block;
     }
 
-    /* 點點矩陣背景與散落照片（照片來自 site-data.json，無資料時只顯示點狀背景，不留破圖） */
     .scatter-grid {
       position: relative; width: 100%; height: 420px;
       background-image: radial-gradient(#aaa 1.5px, transparent 1.5px);
@@ -96,20 +95,24 @@
       background-color: var(--footer-bg); color: var(--footer-text);
       padding: 50px 8% 30px; border-top: 1px solid var(--footer-border); font-size: 0.95rem;
     }
-    .footer-main { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 40px; align-items: start; margin-bottom: 50px; }
-    .footer-left-top p { margin-bottom: 6px; }
-    .footer-left-bottom { margin-top: 40px; color: var(--footer-text-muted); font-size: 0.9rem; }
-    .social-links { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
-    .social-links a { display: flex; align-items: center; gap: 8px; color: var(--footer-text); text-decoration: none; font-weight: 500; }
-    .social-links a:hover { color: var(--blue-accent); }
-    .social-links a img {
-      width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;
+    .footer-main { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 40px; align-items: center; margin-bottom: 50px; }
+    .footer-left p { margin-bottom: 6px; }
+    .footer-left .footer-address { color: var(--footer-text-muted); font-size: 0.9rem; margin-top: 10px; }
+
+    .footer-center { display: flex; }
+    .social-links { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .social-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+    .social-link img {
+      width: 24px; height: 24px; object-fit: contain;
       filter: opacity(0.8) grayscale(100%);
       transition: filter 0.2s ease;
     }
-    .social-links a:hover img { filter: opacity(1) grayscale(0%); }
-    .footer-center a { display: block; color: var(--footer-text); text-decoration: underline; margin-bottom: 10px; font-weight: 500; }
-    .footer-center a:hover { color: var(--blue-accent); }
+    .social-link:hover img { filter: opacity(1) grayscale(0%); }
+    .social-link.icon-fallback span {
+      color: var(--footer-text); font-size: 0.85rem; font-weight: 600;
+    }
+    .social-link.icon-fallback:hover span { color: var(--blue-accent); }
+
     .footer-right { text-align: right; }
     .btn-back-top { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--footer-text); }
     .footer-copyright { border-top: 1px solid #444444; padding-top: 20px; text-align: center; font-size: 0.85rem; color: var(--footer-text-muted); }
@@ -128,8 +131,7 @@
 
   <section class="hero">
     <div class="hero-left">
-      <h1 id="heroTitle">Developer Student Clubs
-on CSMU</h1>
+      <h1 id="heroTitle">Developer Student Clubs on CSMU</h1>
       <div class="subtitle" id="heroSubtitle">中山醫學大學 AI與開源資訊社</div>
       <a href="#contact" class="btn-contact">Contact Us</a>
     </div>
@@ -138,7 +140,7 @@ on CSMU</h1>
   </section>
 
   <section class="section-padding">
-    <h2 style="font-size: 1.8rem; margin-bottom: 30px; color: var(--heading-dark);">關於我們的社團特色</h2>
+    <h2 style="font-size: 1.8rem; margin-bottom: 30px; color: var(--heading-dark);">社團特色</h2>
     <div class="slider-wrapper">
       <button class="slider-btn slider-btn-left" id="prevBtn" onclick="prevCard()">&lt;</button>
       <div class="card-container" id="cardContainer"></div>
@@ -147,8 +149,8 @@ on CSMU</h1>
   </section>
 
   <section class="section-padding" style="background-color: var(--bg-light); text-align: center;">
-    <h2 style="font-size: 1.8rem; margin-bottom: 10px; color: var(--heading-dark);">社團行事曆 & 活動時間</h2>
-    <p style="color: var(--text-gray);">社團行事曆</p>
+    <h2 style="font-size: 1.8rem; margin-bottom: 10px; color: var(--heading-dark);">社團行事曆</h2>
+    <p style="color: var(--text-gray);">歡迎查閱最新的社課、工作坊與活動安排</p>
 
     <div class="calendar-container">
       <iframe class="calendar-iframe" src="https://calendar.google.com/calendar/embed?src=dsccsmu%40gmail.com&ctz=Asia%2FTaipei"></iframe>
@@ -159,21 +161,13 @@ on CSMU</h1>
 
   <footer id="contact">
     <div class="footer-main">
-      <div>
-        <div class="footer-left-top">
-          <p id="footerEmail">dsccsmu@gmail.com</p>
-          <div class="social-links" id="socialLinks"></div>
-        </div>
-        <div class="footer-left-bottom">
-          <p id="footerAddress">Taichung, Taiwan</p>
-        </div>
+      <div class="footer-left">
+        <p id="footerEmail">dsccsmu@gmail.com</p>
+        <p id="footerAddress" class="footer-address">Taichung, Taiwan</p>
       </div>
 
       <div class="footer-center">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Accessibility Statement</a>
-        <a href="#">Terms & Conditions</a>
-        <a href="#">Refund Policy</a>
+        <div id="social-links-container" class="social-links"></div>
       </div>
 
       <div class="footer-right">
