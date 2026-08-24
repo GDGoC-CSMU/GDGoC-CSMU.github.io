@@ -47,6 +47,7 @@
       font-size: 0.95rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block;
     }
 
+    /* 點點矩陣背景與散落照片（照片來自 site-data.json，無資料時只顯示點狀背景，不留破圖） */
     .scatter-grid {
       position: relative; width: 100%; height: 420px;
       background-image: radial-gradient(#aaa 1.5px, transparent 1.5px);
@@ -99,6 +100,7 @@
     .footer-left p { margin-bottom: 6px; }
     .footer-left .footer-address { color: var(--footer-text-muted); font-size: 0.9rem; margin-top: 10px; }
 
+    /* 社群圖示容器（取代原本的 Privacy Policy 等法律連結位置） */
     .footer-center { display: flex; }
     .social-links { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
     .social-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
@@ -108,6 +110,7 @@
       transition: filter 0.2s ease;
     }
     .social-link:hover img { filter: opacity(1) grayscale(0%); }
+    /* 圖片載入失敗時（路徑錯誤、檔案被刪除）JS 會加上這個 class 並改顯示文字，避免破圖 */
     .social-link.icon-fallback span {
       color: var(--footer-text); font-size: 0.85rem; font-weight: 600;
     }
@@ -131,7 +134,8 @@
 
   <section class="hero">
     <div class="hero-left">
-      <h1 id="heroTitle">Developer Student Clubs on CSMU</h1>
+      <h1 id="heroTitle">Developer Student Clubs
+on CSMU</h1>
       <div class="subtitle" id="heroSubtitle">中山醫學大學 AI與開源資訊社</div>
       <a href="#contact" class="btn-contact">Contact Us</a>
     </div>
@@ -140,7 +144,7 @@
   </section>
 
   <section class="section-padding">
-    <h2 style="font-size: 1.8rem; margin-bottom: 30px; color: var(--heading-dark);">社團特色</h2>
+    <h2 style="font-size: 1.8rem; margin-bottom: 30px; color: var(--heading-dark);">關於我們的社團特色</h2>
     <div class="slider-wrapper">
       <button class="slider-btn slider-btn-left" id="prevBtn" onclick="prevCard()">&lt;</button>
       <div class="card-container" id="cardContainer"></div>
@@ -149,7 +153,7 @@
   </section>
 
   <section class="section-padding" style="background-color: var(--bg-light); text-align: center;">
-    <h2 style="font-size: 1.8rem; margin-bottom: 10px; color: var(--heading-dark);">社團行事曆</h2>
+    <h2 style="font-size: 1.8rem; margin-bottom: 10px; color: var(--heading-dark);">社團行事曆 & 活動時間</h2>
     <p style="color: var(--text-gray);">歡迎查閱最新的社課、工作坊與活動安排</p>
 
     <div class="calendar-container">
@@ -185,7 +189,7 @@
     function renderScatterGrid(images) {
       const grid = document.getElementById("scatterGrid");
       if (!Array.isArray(images) || images.length === 0) {
-        grid.innerHTML = ""; /* 只留下 CSS 畫出的點狀背景，不放任何照片 */
+        grid.innerHTML = "";
         return;
       }
       const positions = ["photo-1", "photo-2", "photo-3", "photo-4"];
@@ -230,7 +234,7 @@
       currentIndex = (currentIndex - 1 + flashCards.length) % flashCards.length;
       renderCard();
     }
-    renderCard(); /* 先渲染空狀態，避免 fetch 完成前出現未初始化畫面 */
+    renderCard();
 
     async function loadSiteContent() {
       try {
