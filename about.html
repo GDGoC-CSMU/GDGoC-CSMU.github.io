@@ -137,19 +137,19 @@
 
   /* 社群圖示容器（取代原本的 Privacy Policy 等法律連結位置） */
   .footer-center { display: flex; }
-  .social-links { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .social-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-  .social-link img {
+  .social-links-row { display: flex; gap: 16px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .social-links-row a { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+  .social-links-row img {
     width: 24px; height: 24px; object-fit: contain;
-    filter: opacity(0.8) grayscale(100%);
-    transition: filter 0.2s ease;
+    filter: brightness(0.8) grayscale(100%);
+    transition: all 0.2s;
   }
-  .social-link:hover img { filter: opacity(1) grayscale(0%); }
+  .social-links-row a:hover img { filter: brightness(1.15) grayscale(0%); }
   /* 圖片載入失敗時（路徑錯誤、檔案被刪除）JS 會加上這個 class 並改顯示文字，避免破圖 */
-  .social-link.icon-fallback span {
+  .social-links-row a.icon-fallback span {
     color: var(--footer-text); font-size: 0.85rem; font-weight: 600;
   }
-  .social-link.icon-fallback:hover span { color: var(--blue-accent); }
+  .social-links-row a.icon-fallback:hover span { color: var(--blue-accent); }
 
   .footer-right { text-align: right; }
   .btn-back-top { background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--footer-text); }
@@ -195,7 +195,6 @@
   </section>
 
   <section class="timeline-section">
-    <h2>社團發展歷程</h2>
     <ol class="timeline" id="timelineList"></ol>
   </section>
 
@@ -207,7 +206,7 @@
       </div>
 
       <div class="footer-center">
-        <div id="social-links-container" class="social-links"></div>
+        <div id="social-links-container" class="social-links-row"></div>
       </div>
 
       <div class="footer-right">
@@ -218,7 +217,7 @@
     <div class="footer-copyright">&copy; 2026 by CSMU GDGoC</div>
   </footer>
 
-  <script src="footer.js"></script>
+  <script src="footer.js?v=3"></script>
 
   <script>
     const FALLBACK_TIMELINE = [];
@@ -227,6 +226,7 @@
       const [y = 0, m = 0, d = 0] = parts;
       return y * 10000 + m * 100 + d;
     }
+
     function renderTimeline(data) {
       const list = document.getElementById("timelineList");
 
