@@ -83,6 +83,17 @@
     "社員大會"
   ],
   "courses": [],
-  "activities": [],
+  "activities": [
+    {
+      "id": "a_mtf6gifh681t",
+      "title": "小小醫療創新家-親子挑戰賽",
+      "category": "服務",
+      "img": "assets/images/1788057353472-149773.jpg",
+      "date": "2026.05.10",
+      "location": "中山醫學大學",
+      "description": "中山醫學大學與社團法人台灣直覺職掘職涯探索協會舉辦「小小醫療創新家─親子挑戰賽」。敝社設計「AI醫療偵探」，引導家長及孩子找出AI醫療圖漏洞、醫療假資訊。\n中山醫電子報 https://rd.csmu.edu.tw/p/406-1015-76980,r582.php?Lang=zh-tw\n中央社新聞 https://www.cna.com.tw/postwrite/chi/433077",
+      "link": ""
+    }
+  ],
   "timeline": []
 }
