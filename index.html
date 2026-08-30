@@ -47,6 +47,25 @@
       font-size: 0.95rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block;
     }
 
+    /* GDG Logo 噴射粒子按鈕：按鈕本身就是去背圖案，沒有圓形底色 */
+    .hero-actions { display: flex; align-items: center; gap: 14px; margin-top: 0; }
+    .gdg-logo-btn {
+      background: none; border: none; padding: 0; margin: 0;
+      width: 44px; cursor: pointer; transition: transform 0.15s ease; line-height: 0;
+    }
+    .gdg-logo-btn img { width: 100%; height: auto; display: block; pointer-events: none; }
+    .gdg-logo-btn:active { transform: scale(0.92); }
+    .gdg-float-particle {
+      position: fixed; z-index: 9999; pointer-events: none; object-fit: contain;
+      animation-name: gdgFloatUp; animation-timing-function: cubic-bezier(.2,.7,.3,1);
+      animation-fill-mode: forwards; will-change: transform, opacity;
+    }
+    @keyframes gdgFloatUp {
+      0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+      12%  { opacity: 1; }
+      100% { transform: translate(0, -220px) scale(1); opacity: 0; }
+    }
+
     /* 點點矩陣背景與散落照片（照片來自 site-data.json，無資料時只顯示點狀背景，不留破圖） */
     .scatter-grid {
       position: relative; width: 100%; height: 420px;
@@ -136,7 +155,12 @@
       <h1 id="heroTitle">Developer Student Clubs
 on CSMU</h1>
       <div class="subtitle" id="heroSubtitle">中山醫學大學 AI與開源資訊社</div>
-      <a href="#contact" class="btn-contact">Contact Us</a>
+      <div class="hero-actions">
+        <a href="#contact" class="btn-contact">Contact Us</a>
+        <button id="gdgLogoBtn" class="gdg-logo-btn" type="button" aria-label="GDG Logo">
+          <img src="assets/images/gdg-chevron-logo.png" alt="GDG Logo">
+        </button>
+      </div>
     </div>
 
     <div class="scatter-grid" id="scatterGrid"></div>
@@ -251,6 +275,49 @@ on CSMU</h1>
       }
     }
     loadSiteContent();
+
+    (function () {
+      var FALLBACK_ICONS = ["assets/images/gdg-chevron-logo.png"];
+      var floatingIcons = FALLBACK_ICONS.slice();
+
+      fetch("site-data.json", { cache: "no-store" })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          var list = (data.footer && data.footer.floatingIcons) || [];
+          var urls = list.map(function (item) { return item.url; }).filter(Boolean);
+          if (urls.length) floatingIcons = urls;
+        })
+        .catch(function () {});
+
+      function spawnParticle(originEl) {
+        if (!floatingIcons.length) return;
+        var src = floatingIcons[Math.floor(Math.random() * floatingIcons.length)];
+        var rect = originEl.getBoundingClientRect();
+
+        var particle = document.createElement("img");
+        particle.src = src;
+        particle.alt = "";
+        particle.className = "gdg-float-particle";
+
+        var size = 26 + Math.random() * 16;
+        var duration = (1.4 + Math.random() * 0.9).toFixed(2) + "s";
+
+        particle.style.width = size + "px";
+        particle.style.height = size + "px";
+        particle.style.left = (rect.left + rect.width / 2 - size / 2) + "px";
+        particle.style.top = (rect.top + rect.height * 0.2) + "px";
+        particle.style.animationDuration = duration;
+
+        document.body.appendChild(particle);
+        particle.addEventListener("animationend", function () { particle.remove(); });
+        setTimeout(function () { if (particle.parentNode) particle.remove(); }, 3500);
+      }
+
+      const gdgBtn = document.getElementById("gdgLogoBtn");
+      if (gdgBtn) {
+        gdgBtn.addEventListener("click", function () { spawnParticle(gdgBtn); });
+      }
+    })();
   </script>
   <script src="footer.js?v=4"></script>
 </body>
