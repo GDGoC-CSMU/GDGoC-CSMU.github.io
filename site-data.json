@@ -15,22 +15,22 @@
     "address": "",
     "socialLinks": [
       {
-        "id": "s_mt707xu9h9ia",
-        "platform": "GitHub",
-        "icon": "assets/images/1787561954953-_______2026-08-24_160753.png",
-        "url": "https://github.com/GDGoC-CSMU"
-      },
-      {
         "id": "s_mt7094h40st9",
         "platform": "IG",
-        "icon": "assets/images/1787562124960-_______2026-08-24_170155.png",
+        "icon": "assets/images/social-instagram-white.png",
         "url": "https://www.instagram.com/dsc_csmu/"
       },
       {
         "id": "s_mt71fi2oqvps",
-        "platform": "HackMD",
-        "icon": "",
-        "url": "https://hackmd.io/@dsc-csmu"
+        "platform": "Discord",
+        "icon": "assets/images/social-discord-white.png",
+        "url": "https://discord.gg/sQy8EByUxc"
+      },
+      {
+        "id": "s_mt707xu9h9ia",
+        "platform": "GitHub",
+        "icon": "assets/images/social-github-white.png",
+        "url": "https://github.com/GDGoC-CSMU"
       }
     ]
   },
