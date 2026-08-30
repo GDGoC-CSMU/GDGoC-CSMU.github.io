@@ -22,7 +22,6 @@
 
   body { background-color: #ffffff; color: var(--heading-dark); line-height: 1.5; }
 
-  /* ===== Header（沿用原本頁首）===== */
   header {
     position: sticky; top: 0; z-index: 1000;
     display: flex; justify-content: space-between; align-items: center;
@@ -34,7 +33,7 @@
   nav a { text-decoration: none; color: var(--heading-dark); font-size: 0.95rem; font-weight: 500; }
   nav a:hover, nav a.active { color: var(--blue-accent); }
 
-  /* ===== 主要內容：側欄 + 卡片網格 ===== */
+  /*側欄 + 卡片網格*/
   main { padding: 50px 8% 80px; }
   main h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
   main > .page-desc { color: var(--text-gray); margin-bottom: 40px; }
@@ -46,7 +45,7 @@
     align-items: start;
   }
 
-  /* 分類選單 */
+  /*分類選單*/
   .sidebar { position: sticky; top: 100px; }
   .sidebar h2 { font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;
     color: var(--text-gray); margin-bottom: 16px; }
@@ -87,7 +86,7 @@
     text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
   .course-card .card-name { font-weight: 700; font-size: 1rem; }
 
-  /* ===== 懸停：卡片內浮出簡介與相關連結 ===== */
+  /*卡片內浮出簡介與相關連結*/
   .course-info-overlay {
     position: absolute; inset: 0;
     display: flex; flex-direction: column; justify-content: flex-end;
@@ -116,6 +115,8 @@
     transition: border-color .2s ease;
   }
   .course-info-overlay .overlay-link:hover { border-color: #fff; }
+  .overlay-links { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+  .overlay-links .overlay-link { font-size: 0.76rem; word-break: break-all; }
 
   /* ===== 空狀態（尚無資料 / 該分類尚無卡片） ===== */
   .empty-state {
@@ -126,7 +127,7 @@
     padding: 70px 20px;
   }
 
-  /* ===== Footer（全站統一：深灰底、淺色文字） ===== */
+  /*Footer*/
   footer {
     background-color: var(--footer-bg); color: var(--footer-text);
     padding: 50px 8% 30px; border-top: 1px solid var(--footer-border); font-size: 0.95rem;
@@ -246,6 +247,11 @@
             <h3>${c.title || "（未命名課程）"}</h3>
             <p>${c.description || ""}</p>
             ${c.link ? `<a class="overlay-link" href="${c.link}" target="_blank" rel="noopener noreferrer">查看課程資源 →</a>` : ""}
+            ${(Array.isArray(c.links) && c.links.filter(l => l && l.url).length) ? `
+              <div class="overlay-links">
+                ${c.links.filter(l => l && l.url).map(l => `<a class="overlay-link" href="${l.url}" target="_blank" rel="noopener noreferrer">${l.label || "相關連結"}｜${l.url}</a>`).join("")}
+              </div>
+            ` : ""}
           </div>
         </article>
       `).join("");
