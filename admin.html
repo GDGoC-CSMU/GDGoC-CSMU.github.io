@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幹部控制台 | GDGoC CSMU</title>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<style>
+  :root {
+    --bg-light: #f8f9fa;
+    --heading-dark: #211510;
+    --text-gray: #555555;
+    --blue-accent: #0073e6;
+    --border-color: #e0e0e0;
+    --footer-bg: #e8e8e8;
+    --danger: #d64545;
+    --success: #1a8a4a;
+    --warn: #c47f0a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; }
+  body { background: var(--bg-light); color: var(--heading-dark); line-height: 1.5; }
+  button { font: inherit; cursor: pointer; }
+  input, textarea, select {
+    font: inherit; width: 100%; padding: 9px 11px; border: 1px solid var(--border-color);
+    background: #fff; color: var(--heading-dark);
+  }
+  label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-gray);
+    margin-bottom: 5px; margin-top: 12px; }
+  label:first-child { margin-top: 0; }
+
+  /* ===== 驗證畫面 ===== */
+  #authScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .auth-box { width: 100%; max-width: 420px; background: #fff; border: 1px solid var(--border-color); padding: 36px 32px; }
+  .auth-box h1 { font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+  .auth-box .sub { color: var(--text-gray); font-size: 0.88rem; margin-bottom: 22px; }
+  .auth-note {
+    background: #fff8ea; border: 1px solid #f0dca0; color: #7a5c00; font-size: 0.8rem;
+    padding: 10px 12px; margin-top: 18px; line-height: 1.6;
+  }
+  .btn-primary { display: inline-block; padding: 10px 24px; background: var(--blue-accent); color: #fff;
+    border: none; font-weight: 600; font-size: 0.92rem; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary { padding: 8px 16px; background: #fff; border: 1px solid var(--border-color);
+    color: var(--heading-dark); font-weight: 600; font-size: 0.85rem; }
+  .btn-danger { padding: 6px 12px; background: #fff; border: 1px solid var(--danger);
+    color: var(--danger); font-size: 0.8rem; font-weight: 600; }
+  .btn-full { width: 100%; text-align: center; }
+  .error-text { color: var(--danger); font-size: 0.82rem; margin-top: 10px; display: none; }
+  .hint { font-size: 0.78rem; color: var(--text-gray); }
+
+  /* ===== 主控台佈局 ===== */
+  #dashboard { display: none; min-height: 100vh; }
+  .topbar { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between;
+    background: #fff; border-bottom: 1px solid var(--border-color); padding: 14px 24px; }
+  .topbar .repo-info { font-size: 0.85rem; color: var(--text-gray); }
+  .topbar .repo-info b { color: var(--heading-dark); }
+  .topbar-actions { display: flex; align-items: center; gap: 14px; }
+  .commit-link { font-size: 0.8rem; color: var(--success); text-decoration: underline; }
+  .commit-link:hover { color: var(--blue-accent); }
+  .dirty-badge { font-size: 0.8rem; font-weight: 600; padding: 5px 10px; }
+  .dirty-badge.dirty { color: var(--warn); background: #fff4de; }
+  .dirty-badge.clean { color: var(--success); background: #e9f8ee; }
+
+  .app-body { display: flex; align-items: flex-start; }
+  .sidebar { width: 200px; flex-shrink: 0; background: #fff; border-right: 1px solid var(--border-color);
+    min-height: calc(100vh - 57px); padding: 20px 0; }
+  .sidebar button { display: block; width: 100%; text-align: left; padding: 12px 22px; background: none;
+    border: none; border-left: 3px solid transparent; color: var(--text-gray); font-size: 0.92rem; font-weight: 600; }
+  .sidebar button:hover { color: var(--heading-dark); background: var(--bg-light); }
+  .sidebar button.active { color: var(--blue-accent); border-left-color: var(--blue-accent); background: var(--bg-light); }
+
+  .main-content { flex: 1; padding: 32px 40px; max-width: 960px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .panel h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; }
+  .panel .panel-desc { color: var(--text-gray); font-size: 0.88rem; margin-bottom: 24px; }
+
+  .section-block { background: #fff; border: 1px solid var(--border-color); padding: 20px 22px; margin-bottom: 20px; }
+  .section-block h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* 子分頁（動態卡片與歷程內：課程／活動／歷程） */
+  .subtabs { display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 1px solid var(--border-color); }
+  .subtab-btn { padding: 10px 18px; background: none; border: none; border-bottom: 3px solid transparent;
+    font-weight: 600; color: var(--text-gray); font-size: 0.9rem; }
+  .subtab-btn.active { color: var(--blue-accent); border-bottom-color: var(--blue-accent); }
+  .subpanel { display: none; }
+  .subpanel.active { display: block; }
+
+  /* 分類標籤管理 */
+  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
+  .tag-chip {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px 6px 12px;
+    background: var(--bg-light); border: 1px solid var(--border-color); font-size: 0.82rem; font-weight: 600;
+  }
+  .tag-chip button {
+    background: none; border: none; color: var(--text-gray); font-size: 0.95rem; line-height: 1;
+    padding: 0 2px; cursor: pointer;
+  }
+  .tag-chip button:hover { color: var(--danger); }
+  .tag-add-row { display: flex; gap: 10px; }
+  .tag-add-row input { flex: 1; }
+  .tag-add-row button { flex-shrink: 0; white-space: nowrap; }
+
+  /* 卡片列表 */
+  .item-list { display: flex; flex-direction: column; gap: 10px; }
+  .item-wrapper { display: flex; flex-direction: column; gap: 0; }
+  .item-row { display: flex; align-items: center; gap: 14px; border: 1px solid var(--border-color);
+    padding: 10px 14px; background: #fff; }
+  .drag-handle { cursor: grab; color: var(--text-gray); font-size: 1.15rem; flex-shrink: 0;
+    padding: 4px 2px; touch-action: none; user-select: none; }
+  .drag-handle:active { cursor: grabbing; }
+  .sortable-ghost { opacity: 0.35; }
+  .sortable-chosen .item-row, .tag-chip.sortable-chosen { box-shadow: 0 0 0 2px var(--blue-accent) inset; }
+
+  /* 照片集 Gallery 縮圖 */
+  .gallery-thumbs { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+  .gallery-thumb-wrap { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+  .gallery-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; border: 1px solid var(--border-color); display: block; }
+  .gallery-thumb-remove { position: absolute; top: -7px; right: -7px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--danger); color: #fff; border: none; font-size: 0.72rem; line-height: 1; padding: 0; cursor: pointer; }
+
+  /* 多組連結編輯列 */
+  .link-edit-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end; margin-top: 8px; }
+  .link-edit-row label { margin-top: 0; }
+  .link-edit-row .btn-danger { height: 38px; }
+
+  /* 媒體庫分頁 */
+  .media-pagination { display: flex; justify-content: center; align-items: center; margin-top: 18px; gap: 4px; }
+  .item-row img.thumb { width: 52px; height: 52px; object-fit: cover; background: var(--bg-light); flex-shrink: 0; }
+  .item-row .item-main { flex: 1; min-width: 0; }
+  .item-row .item-title { font-weight: 700; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-row .item-sub { font-size: 0.78rem; color: var(--text-gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-row .item-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .edit-form { border: 1px dashed var(--blue-accent); background: #f4f9ff; padding: 16px; margin-bottom: 10px; }
+  .edit-form .form-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .add-btn-row { margin-top: 4px; }
+
+  /* 圖片欄位（文字路徑 + 上傳 + 從檔案庫選擇） */
+  .img-field-row { display: flex; gap: 14px; align-items: flex-start; margin-top: 6px; }
+  .img-field-row img.preview { width: 70px; height: 70px; object-fit: cover; background: var(--bg-light);
+    border: 1px solid var(--border-color); flex-shrink: 0; }
+  .img-field-col { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .img-field-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .file-btn { display: inline-block; padding: 8px 14px; background: #fff; border: 1px solid var(--border-color);
+    font-size: 0.8rem; font-weight: 600; text-align: center; }
+
+  /* 社群連結 Icon（圖片，非 Emoji） */
+  .social-icon-thumb {
+    width: 32px; height: 32px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; background: var(--bg-light); border: 1px solid var(--border-color);
+  }
+  .social-icon-thumb img { width: 100%; height: 100%; object-fit: contain; }
+  .icon-preview { width: 40px !important; height: 40px !important; }
+
+  /* ===== 媒體庫 Media Library ===== */
+  .dropzone { border: 2px dashed var(--border-color); padding: 32px 20px; text-align: center;
+    margin-bottom: 22px; color: var(--text-gray); background: #fff; font-size: 0.9rem; }
+  .dropzone.dragover { border-color: var(--blue-accent); background: #f4f9ff; color: var(--blue-accent); }
+  .dropzone .upload-progress { margin-top: 10px; font-size: 0.8rem; color: var(--blue-accent); min-height: 1.2em; }
+  .media-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .media-card { border: 1px solid var(--border-color); background: #fff; overflow: hidden; }
+  .media-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; background: var(--bg-light); }
+  .media-card .media-info { padding: 8px 10px; }
+  .media-card .media-name { font-size: 0.76rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .media-card .media-size { font-size: 0.7rem; color: var(--text-gray); margin-bottom: 6px; }
+  .media-card .media-actions { display: flex; gap: 6px; }
+  .media-card .media-actions button { flex: 1; font-size: 0.72rem; padding: 5px 4px; }
+  .media-card.pickable { cursor: pointer; }
+  .media-card.pickable:hover { border-color: var(--blue-accent); }
+
+  /* Modal（圖片選擇器） */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(15,10,8,0.5); z-index: 3000;
+    display: none; align-items: center; justify-content: center; padding: 24px; }
+  .modal-box { background: #fff; max-width: 760px; width: 100%; max-height: 82vh; overflow-y: auto; padding: 24px; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-header h3 { font-size: 1.05rem; font-weight: 800; }
+  .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--heading-dark); line-height: 1; }
+
+  /* Toast */
+  #toast { position: fixed; bottom: 24px; right: 24px; z-index: 4000;
+    background: var(--heading-dark); color: #fff; padding: 12px 18px; font-size: 0.88rem;
+    display: none; max-width: 340px; }
+  #toast.success { background: var(--success); }
+  #toast.error { background: var(--danger); }
+
+  @media (max-width: 860px) {
+    .app-body { flex-direction: column; }
+    .sidebar { width: 100%; display: flex; overflow-x: auto; padding: 0; min-height: auto; }
+    .sidebar button { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+    .sidebar button.active { border-left-color: transparent; border-bottom-color: var(--blue-accent); }
+    .main-content { padding: 24px 18px; }
+    .row2 { grid-template-columns: 1fr; }
+    .img-field-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ 驗證畫面 ============ -->
+  <section id="authScreen">
+    <div class="auth-box">
+      <h1>幹部控制台</h1>
+      <p class="sub">連接 GitHub Repository 以讀取 / 發布 site-data.json</p>
+
+      <label for="inputOwner">GitHub 帳號 / 組織 (owner)</label>
+      <input id="inputOwner" type="text" placeholder="例如 GDGoC-CSMU">
+      <label for="inputRepo">Repository 名稱</label>
+      <input id="inputRepo" type="text" placeholder="例如 gdgoc-csmu-site">
+      <label for="inputBranch">分支</label>
+      <input id="inputBranch" type="text" value="main">
+      <label for="inputToken">GitHub Personal Access Token (PAT)</label>
+      <input id="inputToken" type="password" placeholder="ghp_xxxxxxxxxxxxxxxx">
+
+      <button class="btn-primary btn-full" style="margin-top:20px;" id="btnConnect" onclick="connectAndLoad()">連接並載入資料</button>
+      <p class="error-text" id="authError"></p>
+
+      <div class="auth-note">
+        ⚠️ 請使用「僅授權此 repository」且僅勾選 <b>Contents: Read and write</b> 權限的 Fine-grained PAT。
+        Token 只會保存在瀏覽器分頁的記憶體中（sessionStorage），關閉分頁即失效，不會被送往除 GitHub 官方 API 以外的任何地方。
+        <br><br>
+        由於本頁面本身是純前端靜態頁面，任何持有此頁面連結「加上」你的 PAT 的人都能取得對 repo 的寫入權限，
+        請勿將 admin.html 加入公開導覽列，並妥善保管 Token。
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 主控台 ============ -->
+  <section id="dashboard">
+    <div class="topbar">
+      <div class="repo-info">連接至 <b id="repoLabel"></b> ・分支 <b id="branchLabel"></b></div>
+      <div class="topbar-actions">
+        <a href="#" id="commitLink" class="commit-link" target="_blank" rel="noopener noreferrer" style="display:none;">✓ 查看最新 commit ↗</a>
+        <span class="dirty-badge clean" id="dirtyBadge">✓ 已同步</span>
+        <button class="btn-secondary" onclick="loadSiteData(true)">重新載入</button>
+        <button class="btn-primary" id="btnPublish" onclick="saveSiteData()">儲存並發布</button>
+      </div>
+    </div>
+
+    <div class="app-body">
+      <nav class="sidebar" id="sidebarNav">
+        <button data-panel="panel-media" class="active">媒體庫 Media</button>
+        <button data-panel="panel-content">全站文案 Content</button>
+        <button data-panel="panel-cards">卡片與歷程 Cards</button>
+      </nav>
+
+      <main class="main-content">
+
+        <!-- ===== 分頁一：媒體 / 檔案庫管理 ===== -->
+        <div class="panel active" id="panel-media">
+          <h2>媒體 / 檔案庫管理</h2>
+          <p class="panel-desc">瀏覽、複製路徑、刪除 <code>assets/images/</code> 內已上傳的檔案，或拖曳上傳新圖片。</p>
+
+          <div class="dropzone" id="dropzone">
+            拖曳圖片到此處上傳，或
+            <label class="file-btn" style="display:inline-block; cursor:pointer;">
+              選擇檔案
+              <input type="file" accept="image/*" multiple style="display:none" onchange="handleMediaUploadFiles(this.files)">
+            </label>
+            <div class="upload-progress" id="uploadProgress"></div>
+          </div>
+
+          <div class="media-toolbar">
+            <button class="btn-secondary" onclick="loadMediaLibrary()">重新整理</button>
+            <span class="hint" id="mediaCount"></span>
+          </div>
+
+          <div class="media-grid" id="mediaGrid"></div>
+          <div class="media-pagination" id="mediaPagination"></div>
+        </div>
+
+        <!-- ===== 分頁二：全站文案與頁尾連結 ===== -->
+        <div class="panel" id="panel-content">
+          <h2>全站文案與頁尾連結</h2>
+          <p class="panel-desc">編輯首頁 Hero 區塊、Flash Cards、About 頁面簡介，以及頁尾聯絡資訊與社群連結。</p>
+
+          <div class="section-block">
+            <h3>首頁 Hero 區塊</h3>
+            <label for="homeBannerTitle">主標題（支援換行 \n）</label>
+            <textarea id="homeBannerTitle" rows="2" oninput="updateHomeField('banner.title', this.value)"></textarea>
+            <label for="homeBannerSubtitle">副標題</label>
+            <input id="homeBannerSubtitle" type="text" oninput="updateHomeField('banner.subtitle', this.value)">
+            <label>Banner 散落照片</label>
+            <div class="item-list" id="bannerImageList"></div>
+            <div class="add-btn-row"><button class="btn-secondary" onclick="addBannerImageSlot()">+ 新增 Banner 照片</button></div>
+          </div>
+
+          <div class="section-block">
+            <h3>Flash Cards（社團特色輪播卡片）</h3>
+            <div class="item-list" id="flashCardList"></div>
+            <div class="add-btn-row"><button class="btn-secondary" onclick="addFlashCard()">+ 新增 Flash Card</button></div>
+          </div>
+
+          <div class="section-block">
+            <h3>About 頁面簡介</h3>
+            <label for="aboutIntro">簡介內文</label>
+            <textarea id="aboutIntro" rows="5" oninput="updateAboutField('intro', this.value)"></textarea>
+          </div>
+
+          <div class="section-block">
+            <h3>頁尾聯絡資訊</h3>
+            <div class="row2">
+              <div>
+                <label for="footerEmail">Email</label>
+                <input id="footerEmail" type="text" oninput="updateFooterField('email', this.value)">
+              </div>
+              <div>
+                <label for="footerAddress">地址 / 地點</label>
+                <input id="footerAddress" type="text" oninput="updateFooterField('address', this.value)">
+              </div>
+            </div>
+          </div>
+
+          <div class="section-block">
+            <h3>社群平台連結</h3>
+            <div class="item-list" id="socialLinkList"></div>
+            <div class="add-btn-row"><button class="btn-secondary" onclick="addSocialLink()">+ 新增連結</button></div>
+          </div>
+
+          <div class="section-block">
+            <h3>首頁 GDG Logo 動態粒子效果（Contact Us / Floating Icons）</h3>
+            <p class="hint">使用者點擊首頁 GDG Logo 按鈕時，會從下方圖片中隨機挑選，產生向上飄浮、淡出的粒子動畫。建議使用小尺寸、透明背景的圖示。此處只負責管理圖片清單，實際動畫需另外嵌入獨立的前端 Code Snippet（見說明文件）。</p>
+            <div class="item-list" id="floatingIconList"></div>
+            <div class="add-btn-row"><button class="btn-secondary" onclick="addFloatingIcon()">+ 新增圖示</button></div>
+          </div>
+        </div>
+
+        <!-- ===== 分頁三：動態卡片與歷程管理 ===== -->
+        <div class="panel" id="panel-cards">
+          <h2>動態卡片與歷程管理</h2>
+          <p class="panel-desc">管理課程、活動卡片與社團發展歷程時間軸。</p>
+
+          <div class="subtabs" id="subtabsNav">
+            <button class="subtab-btn active" data-sub="sub-courses">課程 Courses</button>
+            <button class="subtab-btn" data-sub="sub-activities">活動 Activities</button>
+            <button class="subtab-btn" data-sub="sub-timeline">歷程 Timeline</button>
+          </div>
+
+          <div class="subpanel active" id="sub-courses">
+            <div class="section-block">
+              <h3>課程分類管理</h3>
+              <p class="hint">新增或刪除課程分類，異動後會立即反映在下方「新增/編輯課程」表單的下拉選單，以及前台 courses.html 的側邊分類選單。拖曳分類標籤可調整順序。</p>
+              <div class="tag-list" id="courseCategoryList"></div>
+              <div class="tag-add-row">
+                <input type="text" id="newCourseCategoryInput" placeholder="輸入新分類名稱，例如 Mobile Dev">
+                <button class="btn-secondary" onclick="addCourseCategory()">+ 新增分類</button>
+              </div>
+            </div>
+            <p class="hint" style="margin-bottom:10px;">拖曳左側 <b>⠿</b> 手把可調整課程顯示順序。</p>
+            <div class="add-btn-row" style="margin-bottom:16px;"><button class="btn-primary" onclick="addCourse()">+ 新增課程</button></div>
+            <div class="item-list" id="courseList"></div>
+          </div>
+
+          <div class="subpanel" id="sub-activities">
+            <div class="section-block">
+              <h3>活動分類管理</h3>
+              <p class="hint">新增或刪除活動分類，異動後會立即反映在下方「新增/編輯活動」表單的下拉選單，以及前台 activities.html 的側邊分類選單。拖曳分類標籤可調整順序。</p>
+              <div class="tag-list" id="activityCategoryList"></div>
+              <div class="tag-add-row">
+                <input type="text" id="newActivityCategoryInput" placeholder="輸入新分類名稱，例如 迎新">
+                <button class="btn-secondary" onclick="addActivityCategory()">+ 新增分類</button>
+              </div>
+            </div>
+            <p class="hint" style="margin-bottom:10px;">拖曳左側 <b>⠿</b> 手把可調整活動顯示順序。</p>
+            <div class="add-btn-row" style="margin-bottom:16px;"><button class="btn-primary" onclick="addActivity()">+ 新增活動</button></div>
+            <div class="item-list" id="activityList"></div>
+          </div>
+
+          <div class="subpanel" id="sub-timeline">
+            <p class="hint" style="margin-bottom:14px;">日期支援 <code>YYYY</code>、<code>YYYY.MM</code>、<code>YYYY.MM.DD</code> 三種精細度。前台顯示順序改為由此處的排列順序決定：拖曳左側 <b>⠿</b> 手把即可調整節點順序，不再強制依日期自動排序。</p>
+            <div class="add-btn-row" style="margin-bottom:16px;"><button class="btn-primary" onclick="addTimelineItem()">+ 新增歷程節點</button></div>
+            <div class="item-list" id="timelineList"></div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </section>
+
+  <!-- ============ 圖片選擇器 Modal ============ -->
+  <div class="modal-overlay" id="mediaPickerModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>從檔案庫選擇圖片</h3>
+        <button class="modal-close" onclick="closeMediaPicker()">&times;</button>
+      </div>
+      <div class="media-grid" id="mediaPickerGrid"></div>
+      <div class="media-pagination" id="mediaPickerPagination"></div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+/* =========================================================================
+   全域狀態
+   ========================================================================= */
+let config = { owner: "", repo: "", branch: "main", token: "" };
+let siteData = null;
+let dataSha = null;
+let isDirty = false;
+let mediaFiles = [];
+let mediaPickerCallback = null;
+const MEDIA_FOLDER = "assets/images";
+const MEDIA_PAGE_SIZE = 20;
+let mediaPage = 1;
+let mediaPickerPage = 1;
+
+const DEFAULT_SITE_DATA = {
+  home: {
+    banner: { title: "Developer Student Clubs\non CSMU", subtitle: "中山醫學大學 AI與開源資訊社", images: [] },
+    flashCards: []
+  },
+  about: { intro: "" },
+  footer: { email: "", address: "", socialLinks: [], floatingIcons: [] },
+  courseCategories: ["Web Dev", "Net Security", "Data Science", "AI Application", "Dev Tools", "Software Projects", "UIUX Design"],
+  activityCategories: ["服務", "講座", "競賽", "校園專案", "Google Event", "社員大會"],
+  courses: [],
+  activities: [],
+  timeline: []
+};
+
+/* =========================================================================
+   共用工具
+   ========================================================================= */
+function uid(prefix) { return prefix + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+function markDirty() {
+  isDirty = true;
+  const badge = document.getElementById("dirtyBadge");
+  badge.textContent = "● 有未發布的變更";
+  badge.className = "dirty-badge dirty";
+}
+function markClean() {
+  isDirty = false;
+  const badge = document.getElementById("dirtyBadge");
+  badge.textContent = "✓ 已發布至 " + config.branch;
+  badge.className = "dirty-badge clean";
+}
+function showToast(message, type) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = type || "";
+  toast.style.display = "block";
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => { toast.style.display = "none"; }, 4000);
+}
+function utf8ToBase64(str) { return btoa(unescape(encodeURIComponent(str))); }
+function base64ToUtf8(b64) { return decodeURIComponent(escape(atob(b64.replace(/\n/g, "")))); }
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = () => reject(new Error("讀取檔案失敗"));
+    reader.readAsDataURL(file);
+  });
+}
+function parseDateKey(dateStr) {
+  const parts = String(dateStr || "").split(".").map(n => parseInt(n, 10) || 0);
+  const [y = 0, m = 0, d = 0] = parts;
+  return y * 10000 + m * 100 + d;
+}
+
+/* =========================================================================
+   GitHub REST API 呼叫封裝
+   文件: https://docs.github.com/en/rest/repos/contents
+   ========================================================================= */
+async function ghRequest(path, options) {
+  options = options || {};
+  const res = await fetch(`https://api.github.com/repos/${config.owner}/${config.repo}${path}`, {
+    method: options.method || "GET",
+    headers: {
+      "Authorization": "token " + config.token,
+      "Accept": "application/vnd.github+json",
+      ...(options.body ? { "Content-Type": "application/json" } : {})
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+  if (!res.ok) {
+    let detail = "";
+    try { detail = (await res.json()).message; } catch (e) {}
+    throw new Error(`GitHub API 錯誤 (${res.status})：${detail || res.statusText}`);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+async function uploadImageToRepo(file) {
+  const base64Content = await fileToBase64(file);
+  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+  const path = `${MEDIA_FOLDER}/${Date.now()}-${safeName}`;
+  await ghRequest(`/contents/${path}`, {
+    method: "PUT",
+    body: { message: `Upload image via admin console: ${safeName}`, content: base64Content, branch: config.branch }
+  });
+  return path;
+}
+
+/* =========================================================================
+   身份驗證與資料載入
+   ========================================================================= */
+function connectAndLoad() {
+  const owner = document.getElementById("inputOwner").value.trim();
+  const repo = document.getElementById("inputRepo").value.trim();
+  const branch = document.getElementById("inputBranch").value.trim() || "main";
+  const token = document.getElementById("inputToken").value.trim();
+  const errorEl = document.getElementById("authError");
+  errorEl.style.display = "none";
+
+  if (!owner || !repo || !token) {
+    errorEl.textContent = "請完整填寫 owner、repository 與 Token。";
+    errorEl.style.display = "block";
+    return;
+  }
+  config = { owner, repo, branch, token };
+  sessionStorage.setItem("gdgoc_admin_config", JSON.stringify(config));
+  loadSiteData(false);
+}
+
+async function loadSiteData(isReload) {
+  const btn = document.getElementById("btnConnect");
+  const errorEl = document.getElementById("authError");
+  if (btn) { btn.disabled = true; btn.textContent = "連接中..."; }
+
+  try {
+    let fileData;
+    try {
+      fileData = await ghRequest(`/contents/site-data.json?ref=${config.branch}`);
+    } catch (err) {
+      if (String(err.message).includes("404")) {
+        const create = confirm("此 repository 尚未找到 site-data.json，是否要以預設空白模板建立？\n（需按下「儲存並發布」才會真正建立檔案）");
+        if (!create) throw new Error("已取消");
+        siteData = JSON.parse(JSON.stringify(DEFAULT_SITE_DATA));
+        dataSha = null;
+        enterDashboard();
+        markDirty();
+        showToast("已載入預設模板，請編輯後按下「儲存並發布」以建立檔案", "");
+        return;
+      }
+      throw err;
+    }
+
+    siteData = JSON.parse(base64ToUtf8(fileData.content));
+    /* 向下相容：舊資料若缺少 about / footer / 分類欄位，補上預設值避免畫面出錯 */
+    if (!siteData.about) siteData.about = { intro: "" };
+    if (!siteData.footer) siteData.footer = { email: "", address: "", socialLinks: [], floatingIcons: [] };
+    if (!Array.isArray(siteData.footer.socialLinks)) siteData.footer.socialLinks = [];
+    if (!Array.isArray(siteData.footer.floatingIcons)) siteData.footer.floatingIcons = [];
+    if (!Array.isArray(siteData.courseCategories)) siteData.courseCategories = [...DEFAULT_SITE_DATA.courseCategories];
+    if (!Array.isArray(siteData.activityCategories)) siteData.activityCategories = [...DEFAULT_SITE_DATA.activityCategories];
+    /* 向下相容：courses / activities 補上 links[]（由舊的單一 link 欄位遷移）與 gallery[] */
+    (siteData.courses || []).forEach(c => {
+      if (!Array.isArray(c.links)) c.links = c.link ? [{ id: uid("lk"), label: "更多資訊", url: c.link }] : [];
+      if (!Array.isArray(c.gallery)) c.gallery = [];
+    });
+    (siteData.activities || []).forEach(a => {
+      if (!Array.isArray(a.links)) a.links = a.link ? [{ id: uid("lk"), label: "報名連結", url: a.link }] : [];
+      if (!Array.isArray(a.gallery)) a.gallery = [];
+    });
+
+    dataSha = fileData.sha;
+    enterDashboard();
+    markClean();
+    if (isReload) showToast("已重新載入最新資料", "success");
+  } catch (err) {
+    if (String(err.message) === "已取消") return;
+    if (document.getElementById("authScreen").style.display !== "none") {
+      errorEl.textContent = err.message;
+      errorEl.style.display = "block";
+    } else {
+      showToast(err.message, "error");
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "連接並載入資料"; }
+  }
+}
+
+function enterDashboard() {
+  document.getElementById("authScreen").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  document.getElementById("repoLabel").textContent = `${config.owner}/${config.repo}`;
+  document.getElementById("branchLabel").textContent = config.branch;
+  renderAll();
+  loadMediaLibrary();
+  initAllSortables();
+}
+
+async function saveSiteData() {
+  const btn = document.getElementById("btnPublish");
+  const commitLink = document.getElementById("commitLink");
+  btn.disabled = true;
+  btn.textContent = "發布中...";
+  commitLink.style.display = "none";
+  try {
+    const content = utf8ToBase64(JSON.stringify(siteData, null, 2));
+    const body = { message: "Update site-data.json via 幹部控制台", content, branch: config.branch };
+    if (dataSha) body.sha = dataSha;
+    const result = await ghRequest("/contents/site-data.json", { method: "PUT", body });
+    dataSha = result.content.sha;
+    markClean();
+
+    /* 方便核對：把這次實際發布出去的社群連結印在 console，
+       若前台仍看不到圖示，可以直接比對這裡的資料是否符合預期。 */
+    console.info("[admin] 本次發布的 footer.socialLinks：", siteData.footer.socialLinks);
+
+    if (result.commit && result.commit.html_url) {
+      commitLink.href = result.commit.html_url;
+      commitLink.style.display = "inline";
+    }
+
+    showToast("已成功發布至 " + config.branch + "，網站將於 GitHub Pages 重新部署後更新（通常需要 30 秒 ~ 幾分鐘）", "success");
+  } catch (err) {
+    showToast("發布失敗：" + err.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "儲存並發布";
+  }
+}
+
+/* =========================================================================
+   主分頁 / 子分頁切換
+   ========================================================================= */
+document.getElementById("sidebarNav").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-panel]");
+  if (!btn) return;
+  document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById(btn.dataset.panel).classList.add("active");
+});
+
+document.getElementById("subtabsNav").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-sub]");
+  if (!btn) return;
+  document.querySelectorAll(".subtab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".subpanel").forEach(p => p.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById(btn.dataset.sub).classList.add("active");
+});
+
+function renderAll() {
+  renderHomeFields();
+  renderBannerImages();
+  renderFlashCards();
+  renderAboutFields();
+  renderFooterFields();
+  renderSocialLinks();
+  renderFloatingIcons();
+  renderCourseCategories();
+  renderActivityCategories();
+  renderCourses();
+  renderActivities();
+  renderTimeline();
+}
+
+function toggleEdit(key) {
+  const el = document.getElementById("edit-" + key);
+  if (!el) return;
+  const isOpen = el.style.display !== "none";
+  document.querySelectorAll(".edit-form").forEach(f => f.style.display = "none");
+  el.style.display = isOpen ? "none" : "block";
+}
+
+/* =========================================================================
+   通用「陣列欄位」存取（供 courses / activities / flashCards / bannerImages 等使用）
+   fieldPath 例如 "courses"、"home.flashCards"、"home.banner.images"
+   ========================================================================= */
+function resolveArray(fieldPath) {
+  const parts = fieldPath.split(".");
+  let ref = siteData;
+  for (const p of parts) ref = ref[p];
+  return ref;
+}
+function updateArrayField(fieldPath, index, key, value) {
+  resolveArray(fieldPath)[index][key] = value;
+  markDirty();
+}
+
+/* =========================================================================
+   通用圖片欄位元件：文字路徑輸入 + 上傳新圖片 + 從檔案庫選擇
+   （用於 index 定址的陣列欄位；timeline 因為要依日期排序改用 id 定址，見下方專屬版本）
+   ========================================================================= */
+function imgFieldId(fieldPath, index, key) { return fieldPath.replace(/\./g, "_") + "-" + index + "-" + key; }
+
+function imageFieldHTML(fieldPath, index, key, value, label) {
+  const idBase = imgFieldId(fieldPath, index, key);
+  return `
+    <label>${label || "圖片"}</label>
+    <div class="img-field-row">
+      <img class="preview" id="prev-${idBase}" src="${value || ""}" alt="">
+      <div class="img-field-col">
+        <input type="text" id="inp-${idBase}" placeholder="圖片路徑或網址，例如 assets/images/xxx.jpg"
+               value="${value || ""}" oninput="onImageTextInput('${fieldPath}', ${index}, '${key}', this.value)">
+        <div class="img-field-btns">
+          <label class="file-btn">上傳新圖片
+            <input type="file" accept="image/*" style="display:none" onchange="handleImageUpload(event, '${fieldPath}', ${index}, '${key}')">
+          </label>
+          <button type="button" class="btn-secondary" onclick="openMediaPicker(function(path){ applyImageSelection('${fieldPath}', ${index}, '${key}', path); })">從檔案庫選擇</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function onImageTextInput(fieldPath, index, key, value) {
+  resolveArray(fieldPath)[index][key] = value;
+  markDirty();
+  const prev = document.getElementById("prev-" + imgFieldId(fieldPath, index, key));
+  if (prev) prev.src = value || "";
+}
+function applyImageSelection(fieldPath, index, key, value) {
+  resolveArray(fieldPath)[index][key] = value;
+  markDirty();
+  const idBase = imgFieldId(fieldPath, index, key);
+  const prev = document.getElementById("prev-" + idBase);
+  const inp = document.getElementById("inp-" + idBase);
+  if (prev) prev.src = value || "";
+  if (inp) inp.value = value || "";
+}
+async function handleImageUpload(event, fieldPath, index, key) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.disabled = true;
+  try {
+    const path = await uploadImageToRepo(file);
+    applyImageSelection(fieldPath, index, key, path);
+    loadMediaLibrary();
+    showToast("圖片已上傳並回填路徑", "success");
+  } catch (err) {
+    showToast("圖片上傳失敗：" + err.message, "error");
+  } finally {
+    event.target.disabled = false;
+  }
+}
+
+/* =========================================================================
+   分頁二：全站文案與頁尾連結
+   ========================================================================= */
+function renderHomeFields() {
+  document.getElementById("homeBannerTitle").value = siteData.home.banner.title || "";
+  document.getElementById("homeBannerSubtitle").value = siteData.home.banner.subtitle || "";
+}
+function updateHomeField(path, value) {
+  const [group, key] = path.split(".");
+  siteData.home[group][key] = value;
+  markDirty();
+}
+
+function renderBannerImages() {
+  const list = document.getElementById("bannerImageList");
+  const images = siteData.home.banner.images;
+  list.innerHTML = images.map((img, i) => `
+    <div class="item-row" style="align-items:flex-start;">
+      <div class="item-main">${imageFieldHTML("home.banner.images", i, "url", img.url, `Banner 照片 ${i + 1}`)}</div>
+      <div class="item-actions"><button class="btn-danger" onclick="removeBannerImage(${i})">刪除</button></div>
+    </div>
+  `).join("") || `<p class="hint">尚無 Banner 照片，可從下方新增。</p>`;
+}
+function addBannerImageSlot() {
+  siteData.home.banner.images.push({ id: uid("b"), url: "" });
+  markDirty();
+  renderBannerImages();
+}
+function removeBannerImage(index) {
+  if (!confirm("確定要刪除這張 Banner 照片嗎？")) return;
+  siteData.home.banner.images.splice(index, 1);
+  markDirty();
+  renderBannerImages();
+}
+
+function renderFlashCards() {
+  const list = document.getElementById("flashCardList");
+  list.innerHTML = siteData.home.flashCards.map((card, i) => `
+    <div class="item-row">
+      <img class="thumb" src="${card.img || ""}" alt="">
+      <div class="item-main">
+        <div class="item-title">${card.title || "（未命名）"}</div>
+        <div class="item-sub">${card.desc || ""}</div>
+      </div>
+      <div class="item-actions">
+        <button class="btn-secondary" onclick="toggleEdit('flashcard-${card.id}')">編輯</button>
+        <button class="btn-danger" onclick="removeFlashCard(${i})">刪除</button>
+      </div>
+    </div>
+    <div id="edit-flashcard-${card.id}" class="edit-form" style="display:none;">
+      <label>標題</label>
+      <input type="text" value="${card.title || ""}" oninput="updateArrayField('home.flashCards', ${i}, 'title', this.value)">
+      <label>描述</label>
+      <textarea rows="2" oninput="updateArrayField('home.flashCards', ${i}, 'desc', this.value)">${card.desc || ""}</textarea>
+      ${imageFieldHTML("home.flashCards", i, "img", card.img, "圖片")}
+      <div class="form-actions"><button class="btn-primary" onclick="toggleEdit('flashcard-${card.id}')">完成</button></div>
+    </div>
+  `).join("") || `<p class="hint">尚無 Flash Card，可從下方新增。</p>`;
+}
+function addFlashCard() {
+  siteData.home.flashCards.push({ id: uid("fc"), title: "新卡片標題", desc: "", img: "" });
+  markDirty();
+  renderFlashCards();
+}
+function removeFlashCard(index) {
+  if (!confirm("確定要刪除這張 Flash Card 嗎？")) return;
+  siteData.home.flashCards.splice(index, 1);
+  markDirty();
+  renderFlashCards();
+}
+
+function renderAboutFields() {
+  document.getElementById("aboutIntro").value = (siteData.about && siteData.about.intro) || "";
+}
+function updateAboutField(key, value) {
+  siteData.about[key] = value;
+  markDirty();
+}
+
+function renderFooterFields() {
+  document.getElementById("footerEmail").value = siteData.footer.email || "";
+  document.getElementById("footerAddress").value = siteData.footer.address || "";
+}
+function updateFooterField(key, value) {
+  siteData.footer[key] = value;
+  markDirty();
+}
+
+function renderSocialLinks() {
+  const list = document.getElementById("socialLinkList");
+  list.innerHTML = siteData.footer.socialLinks.map((link, i) => `
+    <div class="item-row" id="row-social-${link.id}">
+      <div class="social-icon-thumb" id="thumb-social-${link.id}">${link.icon ? `<img src="${link.icon}" alt="">` : "🔗"}</div>
+      <div class="item-main">
+        <div class="item-title" id="title-social-${link.id}">${link.platform || "（未命名平台）"}</div>
+        <div class="item-sub">${link.url || ""}</div>
+      </div>
+      <div class="item-actions">
+        <button class="btn-secondary" onclick="toggleEdit('social-${link.id}')">編輯</button>
+        <button class="btn-danger" onclick="removeSocialLink(${i})">刪除</button>
+      </div>
+    </div>
+    <div id="edit-social-${link.id}" class="edit-form" style="display:none;">
+      <label>平台名稱</label>
+      <input type="text" value="${link.platform || ""}" oninput="updateSocialLinkPlatform('${link.id}', this.value)">
+      <label>URL</label>
+      <input type="text" value="${link.url || ""}" oninput="updateArrayField('footer.socialLinks', ${i}, 'url', this.value)">
+      ${socialIconFieldHTML(i, link.id, link.icon)}
+      <div class="form-actions"><button class="btn-primary" onclick="toggleEdit('social-${link.id}')">完成</button></div>
+    </div>
+  `).join("") || `<p class="hint">尚無社群連結，可從下方新增。</p>`;
+}
+
+/* 平台名稱輸入時，即時更新上方摺疊卡片的標題文字（不整份重新渲染，避免正在編輯的表單被關閉） */
+function updateSocialLinkPlatform(id, value) {
+  const link = siteData.footer.socialLinks.find(l => l.id === id);
+  if (!link) return;
+  link.platform = value;
+  markDirty();
+  const titleEl = document.getElementById("title-social-" + id);
+  if (titleEl) titleEl.textContent = value || "（未命名平台）";
+}
+
+/* 圖示更新時，即時同步更新上方摺疊卡片的圖示縮圖 */
+function refreshSocialThumb(id) {
+  const link = siteData.footer.socialLinks.find(l => l.id === id);
+  const thumb = document.getElementById("thumb-social-" + id);
+  if (link && thumb) thumb.innerHTML = link.icon ? `<img src="${link.icon}" alt="">` : "🔗";
+}
+
+/* 社群連結 Icon 專用圖片欄位：限制上傳格式為 PNG / SVG，預覽尺寸較小。
+   以 id（而非 index）定址內部狀態更新，確保無論列表順序或索引是否變動都能改到正確項目。 */
+function socialIconFieldHTML(index, id, value) {
+  const idBase = imgFieldId("footer.socialLinks", index, "icon");
+  return `
+    <label>Icon 圖片（支援 PNG / SVG，建議使用透明背景的單色圖示）</label>
+    <div class="img-field-row">
+      <img class="preview icon-preview" id="prev-${idBase}" src="${value || ""}" alt="">
+      <div class="img-field-col">
+        <input type="text" id="inp-${idBase}" placeholder="圖示路徑或網址，例如 assets/images/icon-github.svg"
+               value="${value || ""}" oninput="onSocialIconTextInput('${id}', '${idBase}', this.value)">
+        <div class="img-field-btns">
+          <label class="file-btn">上傳圖示
+            <input type="file" accept=".png,.svg,image/png,image/svg+xml"
+                   style="display:none" onchange="handleSocialIconUpload(event, '${id}', '${idBase}')">
+          </label>
+          <button type="button" class="btn-secondary" onclick="openMediaPicker(function(path){ applySocialIconSelection('${id}', '${idBase}', path); })">從媒體庫選擇</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function onSocialIconTextInput(id, idBase, value) {
+  const link = siteData.footer.socialLinks.find(l => l.id === id);
+  if (!link) return;
+  link.icon = value;
+  markDirty();
+  const prev = document.getElementById("prev-" + idBase);
+  if (prev) prev.src = value || "";
+  refreshSocialThumb(id);
+}
+function applySocialIconSelection(id, idBase, value) {
+  const link = siteData.footer.socialLinks.find(l => l.id === id);
+  if (!link) return;
+  link.icon = value;
+  markDirty();
+  const prev = document.getElementById("prev-" + idBase);
+  const inp = document.getElementById("inp-" + idBase);
+  if (prev) prev.src = value || "";
+  if (inp) inp.value = value || "";
+  refreshSocialThumb(id);
+}
+async function handleSocialIconUpload(event, id, idBase) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.disabled = true;
+  try {
+    const path = await uploadImageToRepo(file);
+    applySocialIconSelection(id, idBase, path);
+    loadMediaLibrary();
+    showToast("圖示已上傳並回填路徑", "success");
+  } catch (err) {
+    showToast("圖示上傳失敗：" + err.message, "error");
+  } finally {
+    event.target.disabled = false;
+  }
+}
+
+function addSocialLink() {
+  siteData.footer.socialLinks.push({ id: uid("s"), platform: "新平台", icon: "", url: "" });
+  markDirty();
+  renderSocialLinks();
+}
+function removeSocialLink(index) {
+  if (!confirm("確定要刪除這個社群連結嗎？")) return;
+  siteData.footer.socialLinks.splice(index, 1);
+  markDirty();
+  renderSocialLinks();
+}
+
+/* 首頁 GDG Logo 動態粒子效果：圖片清單管理 */
+function renderFloatingIcons() {
+  const list = document.getElementById("floatingIconList");
+  if (!list) return;
+  const icons = siteData.footer.floatingIcons || [];
+  list.innerHTML = icons.map((img, i) => `
+    <div class="item-row" style="align-items:flex-start;">
+      <div class="item-main">${imageFieldHTML("footer.floatingIcons", i, "url", img.url, `粒子圖示 ${i + 1}`)}</div>
+      <div class="item-actions"><button class="btn-danger" onclick="removeFloatingIcon(${i})">刪除</button></div>
+    </div>
+  `).join("") || `<p class="hint">尚無圖示，可從下方新增。</p>`;
+}
+function addFloatingIcon() {
+  siteData.footer.floatingIcons.push({ id: uid("fi"), url: "" });
+  markDirty();
+  renderFloatingIcons();
+}
+function removeFloatingIcon(index) {
+  if (!confirm("確定要刪除這個粒子圖示嗎？")) return;
+  siteData.footer.floatingIcons.splice(index, 1);
+  markDirty();
+  renderFloatingIcons();
+}
+
+
+/* =========================================================================
+   分類管理（課程 / 活動 共用邏輯）
+   刪除分類時，若已有卡片使用該分類，會先提醒幹部，避免卡片變成「分類未設定」而不自知。
+   ========================================================================= */
+function renderCategoryChips(listElId, categories, onRemove) {
+  const wrap = document.getElementById(listElId);
+  wrap.innerHTML = categories.map((cat, i) => `
+    <span class="tag-chip">
+      ${cat}
+      <button type="button" onclick="${onRemove}(${i})" title="刪除分類">&times;</button>
+    </span>
+  `).join("") || `<p class="hint">尚無分類，請於下方新增。</p>`;
+}
+
+function renderCourseCategories() {
+  renderCategoryChips("courseCategoryList", siteData.courseCategories, "removeCourseCategory");
+}
+function addCourseCategory() {
+  const input = document.getElementById("newCourseCategoryInput");
+  const value = input.value.trim();
+  if (!value) return;
+  if (siteData.courseCategories.includes(value)) {
+    showToast("此分類已存在", "error");
+    return;
+  }
+  siteData.courseCategories.push(value);
+  input.value = "";
+  markDirty();
+  renderCourseCategories();
+}
+function removeCourseCategory(index) {
+  const cat = siteData.courseCategories[index];
+  const usedCount = siteData.courses.filter(c => c.category === cat).length;
+  const msg = usedCount > 0
+    ? `目前有 ${usedCount} 門課程使用「${cat}」這個分類，刪除後這些課程的分類會變成未設定，確定要刪除嗎？`
+    : `確定要刪除分類「${cat}」嗎？`;
+  if (!confirm(msg)) return;
+  siteData.courseCategories.splice(index, 1);
+  markDirty();
+  renderCourseCategories();
+  renderCourses();
+}
+
+function renderActivityCategories() {
+  renderCategoryChips("activityCategoryList", siteData.activityCategories, "removeActivityCategory");
+}
+function addActivityCategory() {
+  const input = document.getElementById("newActivityCategoryInput");
+  const value = input.value.trim();
+  if (!value) return;
+  if (siteData.activityCategories.includes(value)) {
+    showToast("此分類已存在", "error");
+    return;
+  }
+  siteData.activityCategories.push(value);
+  input.value = "";
+  markDirty();
+  renderActivityCategories();
+}
+function removeActivityCategory(index) {
+  const cat = siteData.activityCategories[index];
+  const usedCount = siteData.activities.filter(a => a.category === cat).length;
+  const msg = usedCount > 0
+    ? `目前有 ${usedCount} 個活動使用「${cat}」這個分類，刪除後這些活動的分類會變成未設定，確定要刪除嗎？`
+    : `確定要刪除分類「${cat}」嗎？`;
+  if (!confirm(msg)) return;
+  siteData.activityCategories.splice(index, 1);
+  markDirty();
+  renderActivityCategories();
+  renderActivities();
+}
+
+/* 產生 <select> 分類下拉選單的共用 HTML；currentValue 若不在清單中（例如分類已被刪除）會額外加一個提示選項，避免資料被靜默清空 */
+function categorySelectHTML(categories, currentValue, onChangeAttr) {
+  const options = categories.map(cat =>
+    `<option value="${cat}" ${cat === currentValue ? "selected" : ""}>${cat}</option>`
+  ).join("");
+  const missingOption = (currentValue && !categories.includes(currentValue))
+    ? `<option value="${currentValue}" selected>⚠ ${currentValue}（分類已被刪除）</option>`
+    : "";
+  const placeholder = `<option value="" ${!currentValue ? "selected" : ""}>請選擇分類</option>`;
+  return `<select ${onChangeAttr}>${placeholder}${missingOption}${options}</select>`;
+}
+
+/* =========================================================================
+   卡片共用：多組連結（links[]）與照片集（gallery[]）編輯器
+   供 courses / activities 共用；一律以卡片 id（而非 index）定址內部資料，
+   確保拖曳排序或新增/刪除連結、照片時，操作到的一定是正確的那張卡片。
+   ========================================================================= */
+function findItemById(fieldPath, id) {
+  return resolveArray(fieldPath).find(x => x.id === id);
+}
+function rerenderCardList(fieldPath, keepOpenId) {
+  if (fieldPath === "courses") renderCourses();
+  else if (fieldPath === "activities") renderActivities();
+  if (keepOpenId) {
+    const prefix = fieldPath === "courses" ? "course-" : "activity-";
+    const el = document.getElementById("edit-" + prefix + keepOpenId);
+    if (el) el.style.display = "block";
+  }
+}
+
+function linksEditorHTML(fieldPath, id, links) {
+  links = links || [];
+  const rows = links.map(lk => `
+    <div class="link-edit-row">
+      <div>
+        <label>連結文字</label>
+        <input type="text" placeholder="例如「投影片」「報名表單」" value="${lk.label || ""}"
+               oninput="updateLinkField('${fieldPath}','${id}','${lk.id}','label',this.value)">
+      </div>
+      <div>
+        <label>網址 URL</label>
+        <input type="text" placeholder="https://..." value="${lk.url || ""}"
+               oninput="updateLinkField('${fieldPath}','${id}','${lk.id}','url',this.value)">
+      </div>
+      <button type="button" class="btn-danger" onclick="removeLinkItem('${fieldPath}','${id}','${lk.id}')">刪除</button>
+    </div>
+  `).join("");
+  return `
+    <label>相關連結（可新增多組）</label>
+    ${rows || `<p class="hint">尚無連結，可從下方新增。</p>`}
+    <div class="add-btn-row"><button type="button" class="btn-secondary" onclick="addLinkItem('${fieldPath}','${id}')">+ 新增連結</button></div>
+  `;
+}
+function addLinkItem(fieldPath, id) {
+  const item = findItemById(fieldPath, id);
+  if (!item) return;
+  if (!Array.isArray(item.links)) item.links = [];
+  item.links.push({ id: uid("lk"), label: "", url: "" });
+  markDirty();
+  rerenderCardList(fieldPath, id);
+}
+function removeLinkItem(fieldPath, id, linkId) {
+  const item = findItemById(fieldPath, id);
+  if (!item) return;
+  item.links = (item.links || []).filter(l => l.id !== linkId);
+  markDirty();
+  rerenderCardList(fieldPath, id);
+}
+function updateLinkField(fieldPath, id, linkId, key, value) {
+  const item = findItemById(fieldPath, id);
+  if (!item) return;
+  const link = (item.links || []).find(l => l.id === linkId);
+  if (!link) return;
+  link[key] = value;
+  markDirty();
+}
+
+function galleryEditorHTML(fieldPath, id, gallery) {
+  gallery = gallery || [];
+  const thumbs = gallery.map((url, gi) => `
+    <div class="gallery-thumb-wrap">
+      <img src="${url}" alt="">
+      <button type="button" class="gallery-thumb-remove" title="移除"
+        onclick="removeGalleryImage('${fieldPath}','${id}',${gi})">&times;</button>
+    </div>
+  `).join("");
+  return `
+    <label>照片集 Gallery（可新增多張，用於卡片詳細頁圖片輪播）</label>
+    <div class="gallery-thumbs">${thumbs}</div>
+    <div class="img-field-btns" style="margin-top:10px;">
+      <label class="file-btn">上傳新照片
+        <input type="file" accept="image/*" style="display:none" onchange="handleGalleryUpload(event,'${fieldPath}','${id}')">
+      </label>
+      <button type="button" class="btn-secondary"
+        onclick="openMediaPicker(function(path){ addGalleryImage('${fieldPath}','${id}', path); })">從檔案庫選擇</button>
+    </div>
+  `;
+}
+function addGalleryImage(fieldPath, id, path) {
+  const item = findItemById(fieldPath, id);
+  if (!item) return;
+  if (!Array.isArray(item.gallery)) item.gallery = [];
+  item.gallery.push(path);
+  markDirty();
+  rerenderCardList(fieldPath, id);
+}
+function removeGalleryImage(fieldPath, id, index) {
+  const item = findItemById(fieldPath, id);
+  if (!item) return;
+  item.gallery.splice(index, 1);
+  markDirty();
+  rerenderCardList(fieldPath, id);
+}
+async function handleGalleryUpload(event, fieldPath, id) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.disabled = true;
+  try {
+    const path = await uploadImageToRepo(file);
+    addGalleryImage(fieldPath, id, path);
+    loadMediaLibrary();
+    showToast("照片已上傳並加入照片集", "success");
+  } catch (err) {
+    showToast("上傳失敗：" + err.message, "error");
+  } finally {
+    event.target.disabled = false;
+  }
+}
+
+/* =========================================================================
+   拖曳排序（SortableJS）
+   統一管理 標籤(Tags) / 課程 / 活動 / 時間軸 四種清單的拖曳排序。
+   容器元素在整個主控台生命週期中不會被整個替換（render 函式只換 innerHTML），
+   所以只需要在進入主控台時綁定一次即可持續作用於之後重新渲染出的新子節點。
+   ========================================================================= */
+function bindSortable(containerId, arrayRef, options, afterReorderRender) {
+  const el = document.getElementById(containerId);
+  if (!el || typeof Sortable === "undefined") return;
+  if (el._sortableInstance) { el._sortableInstance.destroy(); }
+  el._sortableInstance = new Sortable(el, Object.assign({
+    animation: 150,
+    onEnd: function (evt) {
+      if (evt.oldIndex === evt.newIndex || evt.oldIndex == null || evt.newIndex == null) return;
+      const moved = arrayRef.splice(evt.oldIndex, 1)[0];
+      arrayRef.splice(evt.newIndex, 0, moved);
+      markDirty();
+      if (afterReorderRender) afterReorderRender();
+    }
+  }, options));
+}
+function initAllSortables() {
+  bindSortable("courseCategoryList", siteData.courseCategories, { filter: "button", preventOnFilter: true }, renderCourseCategories);
+  bindSortable("activityCategoryList", siteData.activityCategories, { filter: "button", preventOnFilter: true }, renderActivityCategories);
+  bindSortable("courseList", siteData.courses, { handle: ".drag-handle" }, renderCourses);
+  bindSortable("activityList", siteData.activities, { handle: ".drag-handle" }, renderActivities);
+  bindSortable("timelineList", siteData.timeline, { handle: ".drag-handle" }, renderTimeline);
+}
+
+/* =========================================================================
+   分頁三：課程 Courses
+   ========================================================================= */
+function renderCourses() {
+  const list = document.getElementById("courseList");
+  list.innerHTML = siteData.courses.map((c, i) => `
+    <div class="item-wrapper" data-id="${c.id}">
+      <div class="item-row">
+        <span class="drag-handle" title="拖曳排序">⠿</span>
+        <img class="thumb" src="${c.img || ""}" alt="">
+        <div class="item-main">
+          <div class="item-title">${c.title || "（未命名課程）"}</div>
+          <div class="item-sub">${c.category || ""}</div>
+        </div>
+        <div class="item-actions">
+          <button class="btn-secondary" onclick="toggleEdit('course-${c.id}')">編輯</button>
+          <button class="btn-danger" onclick="removeCourse(${i})">刪除</button>
+        </div>
+      </div>
+      <div id="edit-course-${c.id}" class="edit-form" style="display:none;">
+        <div class="row2">
+          <div>
+            <label>課程標題</label>
+            <input type="text" value="${c.title || ""}" oninput="updateArrayField('courses', ${i}, 'title', this.value)">
+          </div>
+          <div>
+            <label>分類</label>
+            ${categorySelectHTML(siteData.courseCategories, c.category, `onchange="updateArrayField('courses', ${i}, 'category', this.value)"`)}
+          </div>
+        </div>
+        <label>課程說明</label>
+        <textarea rows="2" oninput="updateArrayField('courses', ${i}, 'description', this.value)">${c.description || ""}</textarea>
+        ${linksEditorHTML("courses", c.id, c.links)}
+        ${imageFieldHTML("courses", i, "img", c.img, "封面圖片")}
+        ${galleryEditorHTML("courses", c.id, c.gallery)}
+        <div class="form-actions"><button class="btn-primary" onclick="toggleEdit('course-${c.id}')">完成</button></div>
+      </div>
+    </div>
+  `).join("") || `<p class="hint">尚無課程，請按上方「+ 新增課程」。</p>`;
+}
+function addCourse() {
+  siteData.courses.push({ id: uid("c"), title: "新課程", category: "", img: "", description: "", link: "", links: [], gallery: [] });
+  markDirty();
+  renderCourses();
+}
+function removeCourse(index) {
+  if (!confirm("確定要刪除這門課程嗎？")) return;
+  siteData.courses.splice(index, 1);
+  markDirty();
+  renderCourses();
+}
+
+/* =========================================================================
+   分頁三：活動 Activities
+   ========================================================================= */
+function renderActivities() {
+  const list = document.getElementById("activityList");
+  list.innerHTML = siteData.activities.map((a, i) => `
+    <div class="item-wrapper" data-id="${a.id}">
+      <div class="item-row">
+        <span class="drag-handle" title="拖曳排序">⠿</span>
+        <img class="thumb" src="${a.img || ""}" alt="">
+        <div class="item-main">
+          <div class="item-title">${a.title || "（未命名活動）"}</div>
+          <div class="item-sub">${a.category || ""} ・ ${a.date || ""}</div>
+        </div>
+        <div class="item-actions">
+          <button class="btn-secondary" onclick="toggleEdit('activity-${a.id}')">編輯</button>
+          <button class="btn-danger" onclick="removeActivity(${i})">刪除</button>
+        </div>
+      </div>
+      <div id="edit-activity-${a.id}" class="edit-form" style="display:none;">
+        <div class="row2">
+          <div>
+            <label>活動標題</label>
+            <input type="text" value="${a.title || ""}" oninput="updateArrayField('activities', ${i}, 'title', this.value)">
+          </div>
+          <div>
+            <label>分類</label>
+            ${categorySelectHTML(siteData.activityCategories, a.category, `onchange="updateArrayField('activities', ${i}, 'category', this.value)"`)}
+          </div>
+        </div>
+        <label>日期時間（顯示用文字）</label>
+        <input type="text" value="${a.date || ""}" oninput="updateArrayField('activities', ${i}, 'date', this.value)">
+        <label>地點</label>
+        <input type="text" value="${a.location || ""}" oninput="updateArrayField('activities', ${i}, 'location', this.value)">
+        <label>詳細內容</label>
+        <textarea rows="3" oninput="updateArrayField('activities', ${i}, 'description', this.value)">${a.description || ""}</textarea>
+        ${linksEditorHTML("activities", a.id, a.links)}
+        ${imageFieldHTML("activities", i, "img", a.img, "封面圖片")}
+        ${galleryEditorHTML("activities", a.id, a.gallery)}
+        <div class="form-actions"><button class="btn-primary" onclick="toggleEdit('activity-${a.id}')">完成</button></div>
+      </div>
+    </div>
+  `).join("") || `<p class="hint">尚無活動，請按上方「+ 新增活動」。</p>`;
+}
+function addActivity() {
+  siteData.activities.push({ id: uid("a"), title: "新活動", category: "", img: "", date: "", location: "", description: "", link: "", links: [], gallery: [] });
+  markDirty();
+  renderActivities();
+}
+function removeActivity(index) {
+  if (!confirm("確定要刪除這個活動嗎？")) return;
+  siteData.activities.splice(index, 1);
+  markDirty();
+  renderActivities();
+}
+
+/* =========================================================================
+   分頁三：社團歷程 Timeline
+   時間軸一律依 date（支援 YYYY / YYYY.MM / YYYY.MM.DD）自動由新到舊排序顯示，
+   因此排序後的畫面順序 ≠ siteData.timeline 陣列的原始順序，
+   所有編輯／刪除／圖片操作一律改用「id」定址，避免索引位移造成誤改。
+   ========================================================================= */
+function findTimelineById(id) { return siteData.timeline.find(t => t.id === id); }
+
+function timelineImgId(id) { return "timeline-" + id; }
+
+function timelineImageFieldHTML(id, value) {
+  const idBase = timelineImgId(id);
+  return `
+    <label>照片（選填，留空則該節點不顯示圖片）</label>
+    <div class="img-field-row">
+      <img class="preview" id="prev-${idBase}" src="${value || ""}" alt="">
+      <div class="img-field-col">
+        <input type="text" id="inp-${idBase}" placeholder="圖片路徑或網址"
+               value="${value || ""}" oninput="onTimelineImageTextInput('${id}', this.value)">
+        <div class="img-field-btns">
+          <label class="file-btn">上傳新圖片
+            <input type="file" accept="image/*" style="display:none" onchange="handleTimelineImageUpload(event, '${id}')">
+          </label>
+          <button type="button" class="btn-secondary" onclick="openMediaPicker(function(path){ applyTimelineImageSelection('${id}', path); })">從檔案庫選擇</button>
+          <button type="button" class="btn-secondary" onclick="applyTimelineImageSelection('${id}', '')">移除照片</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function onTimelineImageTextInput(id, value) {
+  const item = findTimelineById(id); if (!item) return;
+  item.imageUrl = value; markDirty();
+  const prev = document.getElementById("prev-" + timelineImgId(id));
+  if (prev) prev.src = value || "";
+}
+function applyTimelineImageSelection(id, value) {
+  const item = findTimelineById(id); if (!item) return;
+  item.imageUrl = value; markDirty();
+  const idBase = timelineImgId(id);
+  const prev = document.getElementById("prev-" + idBase);
+  const inp = document.getElementById("inp-" + idBase);
+  if (prev) prev.src = value || "";
+  if (inp) inp.value = value || "";
+}
+async function handleTimelineImageUpload(event, id) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.disabled = true;
+  try {
+    const path = await uploadImageToRepo(file);
+    applyTimelineImageSelection(id, path);
+    loadMediaLibrary();
+    showToast("圖片已上傳並回填路徑", "success");
+  } catch (err) {
+    showToast("圖片上傳失敗：" + err.message, "error");
+  } finally {
+    event.target.disabled = false;
+  }
+}
+function updateTimelineField(id, key, value) {
+  const item = findTimelineById(id);
+  if (!item) return;
+  item[key] = value;
+  markDirty();
+}
+
+function renderTimeline() {
+  const list = document.getElementById("timelineList");
+  /* 顯示順序改為由 siteData.timeline 陣列順序（拖曳排序）決定，不再自動依日期排序 */
+  list.innerHTML = siteData.timeline.map(t => `
+    <div class="item-wrapper" data-id="${t.id}">
+      <div class="item-row">
+        <span class="drag-handle" title="拖曳排序">⠿</span>
+        <img class="thumb" src="${t.imageUrl || ""}" alt="">
+        <div class="item-main">
+          <div class="item-title">${t.date || "（未設定日期）"}・${t.title || "（未命名節點）"}</div>
+          <div class="item-sub">${t.description || ""}</div>
+        </div>
+        <div class="item-actions">
+          <button class="btn-secondary" onclick="toggleEdit('timeline-${t.id}')">編輯</button>
+          <button class="btn-danger" onclick="removeTimelineItem('${t.id}')">刪除</button>
+        </div>
+      </div>
+      <div id="edit-timeline-${t.id}" class="edit-form" style="display:none;">
+        <div class="row2">
+          <div>
+            <label>日期（YYYY 或 YYYY.MM 或 YYYY.MM.DD）</label>
+            <input type="text" placeholder="例如 2026.08 或 2017.09.15" value="${t.date || ""}"
+                   oninput="updateTimelineField('${t.id}', 'date', this.value)">
+          </div>
+          <div>
+            <label>標題</label>
+            <input type="text" value="${t.title || ""}" oninput="updateTimelineField('${t.id}', 'title', this.value)">
+          </div>
+        </div>
+        <label>內文描述</label>
+        <textarea rows="3" oninput="updateTimelineField('${t.id}', 'description', this.value)">${t.description || ""}</textarea>
+        ${timelineImageFieldHTML(t.id, t.imageUrl)}
+        <div class="form-actions"><button class="btn-primary" onclick="toggleEdit('timeline-${t.id}')">完成</button></div>
+      </div>
+    </div>
+  `).join("") || `<p class="hint">尚無歷程節點，請按上方「+ 新增歷程節點」。</p>`;
+}
+function addTimelineItem() {
+  const now = new Date();
+  const defaultDate = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}`;
+  siteData.timeline.push({ id: uid("t"), date: defaultDate, title: "新節點", description: "", imageUrl: "" });
+  markDirty();
+  renderTimeline();
+}
+function removeTimelineItem(id) {
+  if (!confirm("確定要刪除這個歷程節點嗎？")) return;
+  const idx = siteData.timeline.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  siteData.timeline.splice(idx, 1);
+  markDirty();
+  renderTimeline();
+}
+
+/* =========================================================================
+   分頁一：媒體 / 檔案庫管理 Media Library
+   ========================================================================= */
+async function loadMediaLibrary() {
+  const grid = document.getElementById("mediaGrid");
+  const countEl = document.getElementById("mediaCount");
+  if (grid) grid.innerHTML = `<p class="hint">載入中...</p>`;
+  try {
+    const items = await ghRequest(`/contents/${MEDIA_FOLDER}?ref=${config.branch}`);
+    mediaFiles = (Array.isArray(items) ? items : []).filter(it => it.type === "file");
+  } catch (err) {
+    mediaFiles = [];
+    if (!String(err.message).includes("404")) showToast("讀取檔案庫失敗：" + err.message, "error");
+  }
+  if (countEl) countEl.textContent = `共 ${mediaFiles.length} 個檔案`;
+  mediaPage = 1;
+  mediaPickerPage = 1;
+  renderMediaGrid();
+  renderMediaPickerGrid();
+}
+
+function paginate(files, page) {
+  const totalPages = Math.max(1, Math.ceil(files.length / MEDIA_PAGE_SIZE));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const start = (safePage - 1) * MEDIA_PAGE_SIZE;
+  return { pageItems: files.slice(start, start + MEDIA_PAGE_SIZE), totalPages, safePage };
+}
+
+function paginationControlsHTML(safePage, totalPages, onPrevAttr, onNextAttr) {
+  if (totalPages <= 1) return "";
+  return `
+    <button class="btn-secondary" ${safePage <= 1 ? "disabled" : ""} ${onPrevAttr}>← 上一頁</button>
+    <span class="hint" style="margin:0 12px;">第 ${safePage} / ${totalPages} 頁</span>
+    <button class="btn-secondary" ${safePage >= totalPages ? "disabled" : ""} ${onNextAttr}>下一頁 →</button>
+  `;
+}
+
+function renderMediaGrid() {
+  const grid = document.getElementById("mediaGrid");
+  const pagEl = document.getElementById("mediaPagination");
+  if (!grid) return;
+  const { pageItems, totalPages, safePage } = paginate(mediaFiles, mediaPage);
+  mediaPage = safePage;
+  grid.innerHTML = pageItems.map(f => `
+    <div class="media-card">
+      <img src="${f.download_url}" alt="${f.name}" loading="lazy">
+      <div class="media-info">
+        <div class="media-name" title="${f.name}">${f.name}</div>
+        <div class="media-size">${(f.size / 1024).toFixed(1)} KB</div>
+        <div class="media-actions">
+          <button class="btn-secondary" onclick="copyMediaPath('${f.path}')">複製路徑</button>
+          <button class="btn-danger" onclick="deleteMediaFile('${f.path}', '${f.sha}')">刪除</button>
+        </div>
+      </div>
+    </div>
+  `).join("") || `<p class="hint">尚無已上傳的檔案，可拖曳圖片到上方區域上傳。</p>`;
+  if (pagEl) {
+    pagEl.innerHTML = paginationControlsHTML(safePage, totalPages,
+      `onclick="changeMediaPage(-1)"`, `onclick="changeMediaPage(1)"`);
+  }
+}
+function changeMediaPage(delta) {
+  mediaPage += delta;
+  renderMediaGrid();
+}
+
+function renderMediaPickerGrid() {
+  const grid = document.getElementById("mediaPickerGrid");
+  const pagEl = document.getElementById("mediaPickerPagination");
+  if (!grid) return;
+  const { pageItems, totalPages, safePage } = paginate(mediaFiles, mediaPickerPage);
+  mediaPickerPage = safePage;
+  grid.innerHTML = pageItems.map(f => `
+    <div class="media-card pickable" onclick="selectMediaFromPicker('${f.path}')">
+      <img src="${f.download_url}" alt="${f.name}" loading="lazy">
+      <div class="media-info"><div class="media-name" title="${f.name}">${f.name}</div></div>
+    </div>
+  `).join("") || `<p class="hint">尚無已上傳的檔案，請先在「媒體庫」分頁上傳圖片。</p>`;
+  if (pagEl) {
+    pagEl.innerHTML = paginationControlsHTML(safePage, totalPages,
+      `onclick="changeMediaPickerPage(-1)"`, `onclick="changeMediaPickerPage(1)"`);
+  }
+}
+function changeMediaPickerPage(delta) {
+  mediaPickerPage += delta;
+  renderMediaPickerGrid();
+}
+
+function copyMediaPath(path) {
+  navigator.clipboard.writeText(path)
+    .then(() => showToast("已複製路徑：" + path, "success"))
+    .catch(() => showToast("複製失敗，請手動選取路徑文字", "error"));
+}
+
+async function deleteMediaFile(path, sha) {
+  if (!confirm(`確定要刪除 ${path} 嗎？此操作會直接從 repository 移除該檔案，且無法復原。\n（若有卡片仍引用此路徑，畫面會出現破圖，請先確認沒有卡片在使用這張圖片）`)) return;
+  try {
+    await ghRequest(`/contents/${path}`, {
+      method: "DELETE",
+      body: { message: `Delete image via admin console: ${path}`, sha, branch: config.branch }
+    });
+    showToast("已刪除檔案", "success");
+    loadMediaLibrary();
+  } catch (err) {
+    showToast("刪除失敗：" + err.message, "error");
+  }
+}
+
+function handleMediaUploadFiles(fileList) {
+  const files = Array.from(fileList).filter(f => f.type.startsWith("image/"));
+  if (files.length === 0) return;
+  uploadFilesSequentially(files);
+}
+async function uploadFilesSequentially(files) {
+  const progressEl = document.getElementById("uploadProgress");
+  for (let i = 0; i < files.length; i++) {
+    if (progressEl) progressEl.textContent = `上傳中 ${i + 1}/${files.length}：${files[i].name}`;
+    try {
+      await uploadImageToRepo(files[i]);
+    } catch (err) {
+      showToast(`「${files[i].name}」上傳失敗：${err.message}`, "error");
+    }
+  }
+  if (progressEl) progressEl.textContent = "";
+  showToast("上傳完成", "success");
+  loadMediaLibrary();
+}
+
+/* 拖曳上傳事件綁定 */
+(function initDropzone() {
+  const dz = document.getElementById("dropzone");
+  if (!dz) return;
+  ["dragenter", "dragover"].forEach(evt =>
+    dz.addEventListener(evt, e => { e.preventDefault(); dz.classList.add("dragover"); })
+  );
+  ["dragleave", "drop"].forEach(evt =>
+    dz.addEventListener(evt, e => { e.preventDefault(); dz.classList.remove("dragover"); })
+  );
+  dz.addEventListener("drop", e => {
+    const files = e.dataTransfer.files;
+    if (files && files.length) handleMediaUploadFiles(files);
+  });
+})();
+
+/* =========================================================================
+   圖片選擇器 Modal（跨表單共用：課程／活動／Flash Card／Banner／Timeline）
+   ========================================================================= */
+function openMediaPicker(callback) {
+  mediaPickerCallback = callback;
+  mediaPickerPage = 1;
+  document.getElementById("mediaPickerModal").style.display = "flex";
+  if (mediaFiles.length === 0) loadMediaLibrary(); else renderMediaPickerGrid();
+}
+function selectMediaFromPicker(path) {
+  if (mediaPickerCallback) mediaPickerCallback(path);
+  closeMediaPicker();
+}
+function closeMediaPicker() {
+  document.getElementById("mediaPickerModal").style.display = "none";
+  mediaPickerCallback = null;
+}
+
+/* =========================================================================
+   離開頁面前的未儲存變更提醒
+   ========================================================================= */
+window.addEventListener("beforeunload", (e) => {
+  if (isDirty) { e.preventDefault(); e.returnValue = ""; }
+});
+</script>
+</body>
+</html>
