@@ -56,6 +56,12 @@
         "platform": "GitHub",
         "icon": "assets/images/social-github-white.png",
         "url": "https://github.com/GDGoC-CSMU"
+      },
+      {
+        "id": "s_mtf53eue53vn",
+        "platform": "gdgoc",
+        "icon": "assets/images/1788053958267-social-gdgoc-white.png",
+        "url": "https://gdg.community.dev/gdg-on-campus-chung-shan-medical-university-taichung-taiwan/"
       }
     ]
   },
