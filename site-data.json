@@ -64,6 +64,18 @@
       },
       {
         "id": "s_mtf53eue53vn",
+        "platform": "Line",
+        "icon": "assets/images/1788255276090-social-line-white.png",
+        "url": "https://line.me/R/ti/g/XFzP9B7t-n"
+      },
+      {
+        "id": "s_mtiguwfkt6qo",
+        "platform": "YouTube",
+        "icon": "assets/images/1788255329105-social-youtube-white.png",
+        "url": "https://www.youtube.com/@dsc-csmu"
+      },
+      {
+        "id": "s_mtigy6hj9e1g",
         "platform": "gdgoc",
         "icon": "assets/images/1788053958267-social-gdgoc-white.png",
         "url": "https://gdg.community.dev/gdg-on-campus-chung-shan-medical-university-taichung-taiwan/"
@@ -73,6 +85,10 @@
       {
         "id": "fi_mtfqimotcchr",
         "url": "assets/images/gdg-chevron-logo.png"
+      },
+      {
+        "id": "fi_mtigxwkoh538",
+        "url": "assets/images/1788090675451-_______2026-08-30_195029.png"
       }
     ]
   },
