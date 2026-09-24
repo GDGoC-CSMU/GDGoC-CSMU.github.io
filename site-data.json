@@ -101,7 +101,8 @@
     "競賽",
     "校園專案",
     "Google Event",
-    "社員大會"
+    "社員大會",
+    "迎新"
   ],
   "courses": [],
   "activities": [
@@ -127,6 +128,21 @@
         }
       ],
       "gallery": []
+    },
+    {
+      "id": "a_mues5dt1tpz3",
+      "title": "中山醫地下之謎 : 神秘伯爵的委託",
+      "category": "迎新",
+      "img": "assets/images/1790208985882-____.png",
+      "date": "2026.09.23",
+      "location": "正心樓0625",
+      "description": "",
+      "link": "",
+      "links": [],
+      "gallery": [
+        "assets/images/1790208997955-20260923-1.jpg",
+        "assets/images/1790209005729-20260923-2.jpg"
+      ]
     }
   ],
   "timeline": []
